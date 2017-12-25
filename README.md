@@ -1,28 +1,54 @@
 # Pluggy
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pluggy`. To experiment with that code, run `bin/console` for an interactive prompt.
+Pluggy is meant to be a flexible framework for you to plug your ideas into. It is designed and written with code cleanliness and modularity in mind, even at the expense of usability. Typically, there are usability benefits to maintaining and clean and orderly code base in the long run.
 
-TODO: Delete this and the text above, and describe your gem
+Pluggy is designed to be scalable. It can begin as an application which looks like [sinatra](https://sinatrarb.com), but grow into something which looks more like [rails](https://rubyonrails.com). You can mix and match sinatra-style procs for processing requests and the full MVC model espoused by rails.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add `gem 'pluggy'` to your application's Gemfile and then `bundle install`, or do the normal `gem install pluggy`. If you are using bundler anyways, it's recommended that you use the gem from git:
 
 ```ruby
-gem 'pluggy'
+gem 'pluggy', git: 'https://github.com/izwick-schachter/pluggy', branch: 'master'
 ```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install pluggy
 
 ## Usage
 
-TODO: Write usage instructions here
+Of course, we must begin with "Hello World!" (in a one liner)
+
+```ruby
+require('pluggy')&&get('/'){'Hello world!'}
+```
+
+which expands to:
+
+```ruby
+require 'pluggy'
+get '/' do
+  'Hello world!'
+end
+```
+
+Hmm.... what does the syntax remind me of... Oh! The "Hello world!" example from [the sinatra docs](http://sinatrarb.com/intro.html)!
+
+```ruby
+require 'sinatra'
+get '/' do
+  'Hello world!'
+end
+```
+
+> **Note:** The other HTTP verbs do not have a convenient helper (because reasons). You must use `route :post, '/' do end` for non-get routes for now.
+
+The first dissimilarity between pluggy and sinatra comes in how `params` and `env` and exposed. In sinatra, they are methods defined in the global scope. Because we decided that was ugly, we passed them into the blocks. So, to use params:
+
+```ruby
+require 'pluggy'
+
+get '/' do |params, env|
+  params #=> {:keys => "values"}
+end
+```
 
 ## Development
 
