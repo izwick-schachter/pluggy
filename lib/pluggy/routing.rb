@@ -31,31 +31,42 @@ module Pluggy
 
       attr_reader :verb, :uri, :action, :pattern
 
-      def initialize(verb = :get, uri = "/", to: nil, &block)
+      def initialize(verb = :get, uri = "/", mime_type: nil, to: nil, &block)
+        @mime_type = mime_type
         @verb = format_verb(verb)
         @uri = format_uri(uri)
-        @pattern = Mustermann.new(uri)
+        @pattern = Mustermann.new(@uri)
         throw "No action or block passed" if to.nil? && block.nil?
         if to.nil?
           @action = block
         else
-          controller, action = to.split('#')
+          controller, @action_name = to.split('#')
           controller_filename = controller.underscore
           controller_filename += "_controller" unless controller_filename.end_with? "_controller"
-          file = File.join(ROOT, '/controllers/', "#{controller_filename}.rb")
+          @controller_name = controller_filename.gsub(/_controller$/, '')
+          file = File.join(ROOT, 'controllers', "#{controller_filename}.rb")
           load file if File.exist? file
-          controller_action_from(controller, action)
+          controller_action_from(@controller_name, @action_name)
         end
       end
 
-      def evaluate_with(env)
-        params = @pattern.match(env['PATH_INFO'])
+      def evaluate_with(env, req)
+        req = Rack::Request.new(env) unless req
+        params = @pattern.match(req.path).named_captures.merge(req.params).map { |k,v| [k.to_sym, v] }.to_h
         if @action.is_a? Proc
-          @action.call(params, env)
+          result = @action.call(params, req)
+          View.new(result, mime_type: @mime_type)
         elsif @action.is_a? Method
           @controller.params = params if @controller.respond_to? :params=
-          @controller.env = env if @controller.respond_to? :env=
-          @action.call
+          @controller.req    = req    if @controller.respond_to? :req=
+          @controller.env    = env    if @controller.respond_to? :env=
+          view_file = Dir[File.join(ROOT, 'views', @controller_name, "#{@action_name}*")][0].to_s
+          result =  if File.exist?(view_file)
+                      Pluggy::Compiler.compile(view_file, @controller.instance_exec { binding })
+                    else
+                      @action.call
+                    end
+          View.new(result, filename: view_file, mime_type: @mime_type)
         end
       end
 

@@ -22,6 +22,16 @@ module Pluggy
       def respond_to_missing?(m, *args, &block)
         Pluggy::COMPILERS.keys.include?(m) || super
       end
+
+      def compile(file, b = TOPLEVEL_BINDING)
+        file = File.new(file)
+        extensions = File.basename(file).split('.')[1..-1].map(&:to_sym) & Pluggy::COMPILERS.keys.map(&:to_sym)
+        content = file.read
+        extensions.each do |ext|
+          content = Pluggy::COMPILERS.map { |k,v| [k.to_sym, v] }.to_h[ext].run(content, b).content
+        end
+        content
+      end
     end
   end
 end

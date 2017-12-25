@@ -35,3 +35,11 @@ to_compile :erb do |t,b|
 end
 
 at_exit { start }
+
+=begin
+
+Server requires Router
+Router uses controllers and render
+Compiler is external
+
+=end

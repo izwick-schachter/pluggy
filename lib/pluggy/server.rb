@@ -8,10 +8,11 @@ module Pluggy
     end
 
     def call(env)
-      puts "Getting for #{env['PATH_INFO']}##{env['REQUEST_METHOD'].downcase.to_sym}"
-      route = @router.find_by(uri: env['PATH_INFO'], verb: env['REQUEST_METHOD'], mustermann: true)
+      req = Rack::Request.new(env)
+      puts "Getting for #{req.path}##{req.request_method.downcase.to_sym}"
+      route = @router.find_by(uri: req.path, verb: req.request_method, mustermann: true)
       return status 404 if route.nil?
-      result = route.evaluate_with(env)
+      result = route.evaluate_with(env, req)
       view = result.is_a?(View) ? result : View.new(result)
       rval = [view.content ? 200 : 404, headers(view), [view.content.to_s]]
       puts "Returning #{rval}"

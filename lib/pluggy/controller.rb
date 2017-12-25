@@ -8,14 +8,22 @@ module Pluggy
       @env = env
     end
 
+    def req=(req)
+      @req = req
+    end
+
     private
 
     def params
-      @params.named_captures.map { |k,v| [k.to_sym, v] }.to_h
+      @params
     end
 
     def env
       @env
+    end
+
+    def req
+      @req
     end
   end
 end
