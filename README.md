@@ -50,6 +50,47 @@ get '/' do |params, env|
 end
 ```
 
+But for params that are a part of the path, the syntax is the exact same, because they both use [mustermann](https://github.com/sinatra/mustermann) for route matching.
+
+If you're feeling rails-ish, you can pick a rails-ish file structure and have it work just as well. For example, if this is your file structure:
+
+```bash
+.
+├── assets
+│   └── test.erb
+├── controllers
+│   └── bar_controller.rb
+├── Gemfile
+├── Gemfile.lock
+├── app.rb
+└── views
+    └── bar
+        ├── baz.txt.erb
+        └── test.html.erb
+```
+
+in `app.rb` you can route, just like in rails!
+
+```ruby
+get '/users/:id', to: 'bar#baz'
+```
+
+Which will, just like rails, first run the code in the `#baz` action, then render the view:
+
+```ruby
+# controllers/bar_controller.rb
+class BarController < Pluggy::Controller
+  def baz
+    @user_id = params[:user_id]
+  end
+end
+
+# views/bar/baz.txt.erb
+Login sucessful for <%= @user_id %>!
+```
+
+Which will return (in plain text) "Login sucessful for 1!" when you get '/users/1'.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
