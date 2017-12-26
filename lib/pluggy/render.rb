@@ -1,17 +1,25 @@
 module Pluggy
   class View
     attr_reader :content, :mime_type, :filename
-    
+
     def initialize(content = nil, mime_type: nil, filename: '')
       content = content.content while content.is_a?(View)
       @content = content
+      @file = File.new(filename) if File.exist? filename
       @filename = File.basename filename
       ext = @filename.split('.')[1]
-      @mime_type = mime_type || (@filename.empty? ? 'text/html' : Rack::Mime.mime_type(".#{ext}"))
+      ext_mime_type = Rack::Mime.mime_type(".#{ext}")
+      @mime_type = mime_type || (@filename.empty? ? 'text/html' : ext_mime_type)
+    end
+
+    def compile(b = TOPLEVEL_BINDING)
+      @content = Compiler.compile(@file, b) unless @file.nil?
+      self
     end
 
     def metadata
-      warn "Using View#metadata is deprecated. Please use either View#mime_type or View#filename"
+      warn 'Using View#metadata is deprecated. ' \
+           'Please use either View#mime_type or View#filename'
       {
         mime_type: @mime_type,
         filename: @filename

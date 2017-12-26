@@ -1,0 +1,30 @@
+AllCops:
+  TargetRubyVersion: 2.1
+
+Layout:
+  Exclude:
+    - pluggy.gemspec
+
+Style/Encoding:
+  Exclude:
+    - pluggy.gemspec
+
+Metrics/BlockLength:
+  Exclude:
+    - pluggy.gemspec
+
+Style/HashSyntax:
+  Exclude:
+    - Rakefile
+
+Metrics/MethodLength:
+  Max: 13
+
+Style/UnneededPercentQ:
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false

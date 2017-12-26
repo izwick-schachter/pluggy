@@ -1,29 +1,9 @@
 module Pluggy
   class Controller
-    def params=(params)
-      @params = params
-    end
-
-    def env=(env)
-      @env = env
-    end
-
-    def req=(req)
-      @req = req
-    end
+    attr_writer :params, :env, :req
 
     private
 
-    def params
-      @params
-    end
-
-    def env
-      @env
-    end
-
-    def req
-      @req
-    end
+    attr_reader :params, :env, :req
   end
 end

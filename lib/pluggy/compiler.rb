@@ -1,5 +1,8 @@
 module Pluggy
+  # I know this is bad. It will be fixed when we add Settings.
+  # rubocop:disable Style/MutableConstant
   COMPILERS = {}
+  # rubocop:enable Style/MutableConstant
   class Compiler
     def initialize(name, &block)
       Pluggy::COMPILERS[name] = self
@@ -8,29 +11,35 @@ module Pluggy
     end
 
     def run(text, b = @block.binding)
-      assets = File.join(Pluggy::ROOT, "assets")
+      assets = File.join(Pluggy::ROOT, 'assets')
       file = File.join(assets, "#{text}.#{@name}")
       text = File.read(file) if File.exist?(file)
-      View.new @block.call(text, b)
+      @block.call(text, b)
     end
 
     class << self
       def method_missing(m, *args, &block)
-        Pluggy::COMPILERS.keys.include?(m) ? Pluggy::COMPILERS[m].run(*args, &block) : super
+        return compilers[m].run(*args, &block) if compilers.keys.include?(m)
+        super
       end
 
       def respond_to_missing?(m, *args, &block)
-        Pluggy::COMPILERS.keys.include?(m) || super
+        compilers.keys.include?(m) || super
       end
 
       def compile(file, b = TOPLEVEL_BINDING)
         file = File.new(file)
-        extensions = File.basename(file).split('.')[1..-1].map(&:to_sym) & Pluggy::COMPILERS.keys.map(&:to_sym)
-        content = file.read
-        extensions.each do |ext|
-          content = Pluggy::COMPILERS.map { |k,v| [k.to_sym, v] }.to_h[ext].run(content, b).content
+        extensions = File.basename(file).split('.')[1..-1]
+        valid_exts = extensions.map(&:to_sym) & compilers.keys.map(&:to_sym)
+        valid_exts.inject(file.read) do |content, ext|
+          compilers[ext].run(content, b)
         end
-        content
+      end
+
+      private
+
+      def compilers
+        Pluggy::COMPILERS
       end
     end
   end
