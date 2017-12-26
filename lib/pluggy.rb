@@ -1,6 +1,8 @@
 require 'pluggy/version'
 require 'pluggy/convenience_refinements'
 
+require 'pluggy/settings'
+
 require 'pluggy/render'
 
 require 'pluggy/routing'
@@ -11,11 +13,11 @@ require 'pluggy/controller'
 require 'pluggy/initializers'
 
 module Pluggy
-  ROUTER = Router.new
+  settings[:router] = Router.new
 end
 
 def route(*args, **opts, &block)
-  Pluggy::ROUTER.route(*args, **opts, &block)
+  Pluggy.settings[:router].route(*args, **opts, &block)
 end
 
 def get(*args, **opts, &block)
@@ -24,7 +26,7 @@ end
 
 def start
   Rack::Server.start(
-    app: Pluggy::Server.new(Pluggy::ROUTER),
+    app: Pluggy::Server.new(Pluggy.settings[:router]),
     server: WEBrick,
     port: 3150
   )

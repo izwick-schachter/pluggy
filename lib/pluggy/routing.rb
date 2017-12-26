@@ -2,8 +2,6 @@ require 'mustermann'
 
 module Pluggy
   class Router
-    HTTP_VERBS = %i[get post put patch delete].freeze
-
     attr_reader :routes
 
     def initialize(routes = [])
@@ -51,9 +49,10 @@ module Pluggy
         req ||= Rack::Request.new(env)
         request_params = req.params.symbolize_keys
         params = request_params.merge(path_params(req.path))
-        if @action.class == Proc
+        case @action
+        when Proc
           evaluate_block_with(env, req, params)
-        elsif @action.class == Method
+        when Method
           evaluate_action_with(env, req, params)
         end
       end
@@ -94,13 +93,17 @@ module Pluggy
       end
 
       def controller_name_from(controller)
-        controller.underscore.gsub(/_controller$/, '')
+        controller.underscore.gsub(/#{controller_suffix}$/, '')
       end
 
       def load_controller(controller_name)
-        controller_file_basename = "#{controller_name}_controller.rb"
+        controller_file_basename = "#{controller_name}#{controller_suffix}.rb"
         file = File.join(controller_dir, controller_file_basename)
         load file if File.exist? file
+      end
+
+      def controller_suffix
+        Pluggy.settings[:controller_suffix]
       end
 
       def evaluate_action_with(env, req, params)
@@ -125,11 +128,11 @@ module Pluggy
       end
 
       def view_dir
-        File.join(ROOT, 'views')
+        File.join(Pluggy.settings[:root], Pluggy.settings[:view_path])
       end
 
       def controller_dir
-        File.join(ROOT, 'controllers')
+        File.join(Pluggy.settings[:root], Pluggy.settings[:controller_path])
       end
 
       def path_params(path)

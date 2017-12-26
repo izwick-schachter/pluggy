@@ -1,17 +1,13 @@
 module Pluggy
-  # I know this is bad. It will be fixed when we add Settings.
-  # rubocop:disable Style/MutableConstant
-  COMPILERS = {}
-  # rubocop:enable Style/MutableConstant
   class Compiler
     def initialize(name, &block)
-      Pluggy::COMPILERS[name] = self
+      Pluggy.settings[:compilers][name] = self
       @block = block
       @name = name.downcase.to_sym
     end
 
     def run(text, b = @block.binding)
-      assets = File.join(Pluggy::ROOT, 'assets')
+      assets = File.join(Pluggy.settings[:root], Pluggy.settings[:asset_path])
       file = File.join(assets, "#{text}.#{@name}")
       text = File.read(file) if File.exist?(file)
       @block.call(text, b)
@@ -39,7 +35,7 @@ module Pluggy
       private
 
       def compilers
-        Pluggy::COMPILERS
+        Pluggy.settings[:compilers]
       end
     end
   end

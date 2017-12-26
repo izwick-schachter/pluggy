@@ -9,7 +9,8 @@ module Pluggy
       @filename = File.basename filename
       ext = @filename.split('.')[1]
       ext_mime_type = Rack::Mime.mime_type(".#{ext}")
-      @mime_type = mime_type || (@filename.empty? ? 'text/html' : ext_mime_type)
+      default = Pluggy.settings[:default_mime_type]
+      @mime_type = mime_type || (@filename.empty? ? default : ext_mime_type)
     end
 
     def compile(b = TOPLEVEL_BINDING)

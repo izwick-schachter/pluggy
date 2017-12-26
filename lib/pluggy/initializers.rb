@@ -1,3 +1,3 @@
 module Pluggy
-  ROOT = Dir.pwd
+  settings[:root] = Dir.pwd
 end
