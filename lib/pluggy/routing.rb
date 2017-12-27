@@ -29,15 +29,18 @@ module Pluggy
 
       attr_reader :verb, :uri, :action, :pattern
 
-      def initialize(verb = :get, uri = '/', mime_type: nil, to: nil, &block)
+      def initialize(verb, uri, mime_type: nil, asset: nil, to: nil, &block)
         @mime_type = mime_type
         @verb = format_verb(verb)
         @uri = format_uri(uri)
         @pattern = Mustermann.new(@uri)
-        throw 'No action or block passed' if to.nil? && block.nil?
-        if to.nil?
+        error = 'No action, asset or block passed'
+        throw error unless [to, block, asset].count(&:nil?) == 2
+        if    !block.nil?
           @action = block
-        else
+        elsif !asset.nil?
+          @action = asset
+        elsif !to.nil?
           controller, @action_name = to.split('#')
           @controller_name = controller_name_from(controller)
           load_controller @controller_name
@@ -54,6 +57,8 @@ module Pluggy
           evaluate_block_with(env, req, params)
         when Method
           evaluate_action_with(env, req, params)
+        when String
+          evaluate_asset_with(env, req, params)
         end
       end
 
@@ -127,12 +132,26 @@ module Pluggy
         View.new(result, mime_type: @mime_type)
       end
 
+      def evaluate_asset_with(env, req, params)
+        file = File.new(File.join(asset_dir, @action))
+        scope = Class.new
+        scope.send(:define_method, :params) { params }
+        scope.send(:define_method, :req) { req }
+        scope.send(:define_method, :env) { env }
+        b = scope.new.instance_exec { binding }
+        View.new(file.read, filename: file.to_path).compile(b)
+      end
+
       def view_dir
         File.join(Pluggy.settings[:root], Pluggy.settings[:view_path])
       end
 
       def controller_dir
         File.join(Pluggy.settings[:root], Pluggy.settings[:controller_path])
+      end
+
+      def asset_dir
+        File.join(Pluggy.settings[:root], Pluggy.settings[:asset_path])
       end
 
       def path_params(path)

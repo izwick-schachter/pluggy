@@ -7,9 +7,6 @@ module Pluggy
     end
 
     def run(text, b = @block.binding)
-      assets = File.join(Pluggy.settings[:root], Pluggy.settings[:asset_path])
-      file = File.join(assets, "#{text}.#{@name}")
-      text = File.read(file) if File.exist?(file)
       @block.call(text, b)
     end
 
