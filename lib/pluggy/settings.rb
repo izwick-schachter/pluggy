@@ -64,7 +64,8 @@ module Pluggy
     end
 
     def [](key)
-      warn "Tried to access uninitialized setting #{key}" unless @settings.keys.include? key
+      warning = "Tried to access uninitialized setting #{key}"
+      warn warning unless @settings.keys.include? key
       @settings[key]
     end
 

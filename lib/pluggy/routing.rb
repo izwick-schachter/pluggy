@@ -1,5 +1,9 @@
 require 'mustermann'
 
+require 'pluggy/routing/asset'
+require 'pluggy/routing/block'
+require 'pluggy/routing/controller'
+
 module Pluggy
   class Router
     attr_reader :routes
@@ -29,37 +33,26 @@ module Pluggy
 
       attr_reader :verb, :uri, :action, :pattern
 
-      def initialize(verb, uri, mime_type: nil, asset: nil, to: nil, &block)
-        @mime_type = mime_type
+      OPT_TO_TYPE = {
+        block: Route::Block,
+        asset: Route::Asset,
+        to: Route::Controller
+      }.freeze
+
+      def initialize(verb, uri, mime_type: nil, **opts, &block)
         @verb = format_verb(verb)
         @uri = format_uri(uri)
         @pattern = Mustermann.new(@uri)
-        error = 'No action, asset or block passed'
-        throw error unless [to, block, asset].count(&:nil?) == 2
-        if    !block.nil?
-          @action = block
-        elsif !asset.nil?
-          @action = asset
-        elsif !to.nil?
-          controller, @action_name = to.split('#')
-          @controller_name = controller_name_from(controller)
-          load_controller @controller_name
-          controller_action_from(@controller_name, @action_name)
-        end
+        opts = opts.merge(block: block)
+        action_class, value = parse_opts(opts)
+        @action = action_class.new(value, mime_type: mime_type)
       end
 
       def evaluate_with(env, req = nil)
         req ||= Rack::Request.new(env)
         request_params = req.params.symbolize_keys
         params = request_params.merge(path_params(req.path))
-        case @action
-        when Proc
-          evaluate_block_with(env, req, params)
-        when Method
-          evaluate_action_with(env, req, params)
-        when String
-          evaluate_asset_with(env, req, params)
-        end
+        @action.evaluate(env, req, params)
       end
 
       def matches_uri(uri = nil, mustermann: false, **_opts)
@@ -82,76 +75,21 @@ module Pluggy
 
       private
 
+      def parse_opts(opts)
+        opt = opts.select { |k, v| OPT_TO_TYPE.keys.include?(k) && !v.nil? }
+        error = 'No action, asset or block passed'
+        throw error unless opt.length == 1
+        key, value = opt.flatten
+        # [action_class, value]
+        [OPT_TO_TYPE[key], value]
+      end
+
       def format_uri(uri)
         uri.to_s
       end
 
       def format_verb(verb)
         verb.downcase.to_sym
-      end
-
-      def controller_action_from(controller, action)
-        controller = controller.titleize
-        controller += 'Controller' unless Object.const_defined?(controller)
-        @controller = Object.const_get(controller).new
-        @action = @controller.method(action)
-      end
-
-      def controller_name_from(controller)
-        controller.underscore.gsub(/#{controller_suffix}$/, '')
-      end
-
-      def load_controller(controller_name)
-        controller_file_basename = "#{controller_name}#{controller_suffix}.rb"
-        file = File.join(controller_dir, controller_file_basename)
-        load file if File.exist? file
-      end
-
-      def controller_suffix
-        Pluggy.settings[:controller_suffix]
-      end
-
-      def evaluate_action_with(env, req, params)
-        controller_vars(params: params, env: env, req: req)
-        view_files = File.join(view_dir, @controller_name, @action_name.to_s)
-        view_file = Dir["#{view_files}*"][0].to_s
-        result = @action.call
-        view = View.new(result, filename: view_file, mime_type: @mime_type)
-        view.compile(@controller.instance_exec { binding })
-      end
-
-      def controller_vars(**opts)
-        opts.each do |k, v|
-          setter = "#{k}=".to_sym
-          @controller.method(setter).call(v) if @controller.respond_to? setter
-        end
-      end
-
-      def evaluate_block_with(_env, req, params)
-        result = @action.call(params, req)
-        View.new(result, mime_type: @mime_type)
-      end
-
-      def evaluate_asset_with(env, req, params)
-        file = File.new(File.join(asset_dir, @action))
-        scope = Class.new
-        scope.send(:define_method, :params) { params }
-        scope.send(:define_method, :req) { req }
-        scope.send(:define_method, :env) { env }
-        b = scope.new.instance_exec { binding }
-        View.new(file.read, filename: file.to_path).compile(b)
-      end
-
-      def view_dir
-        File.join(Pluggy.settings[:root], Pluggy.settings[:view_path])
-      end
-
-      def controller_dir
-        File.join(Pluggy.settings[:root], Pluggy.settings[:controller_path])
-      end
-
-      def asset_dir
-        File.join(Pluggy.settings[:root], Pluggy.settings[:asset_path])
       end
 
       def path_params(path)
