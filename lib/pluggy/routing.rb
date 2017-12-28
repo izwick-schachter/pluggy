@@ -1,3 +1,5 @@
+require 'pluggy/routing/action'
+
 require 'pluggy/routing/asset'
 require 'pluggy/routing/block'
 require 'pluggy/routing/controller'
@@ -14,17 +16,18 @@ module Pluggy
 
     attr_accessor :settings
 
-    def initialize(routes = [], route_class: Route, matcher_class: nil, settings: Pluggy::Settings.new)
+    def initialize(routes = [], route_class: Route, matcher_class: nil, view_class: nil, settings: Pluggy::Settings.new)
       warn "You did not pass a matcher" if matcher_class.nil?
       warn "You did not pass any settings" if settings.nil?
       @settings = settings
+      @view_class = view_class
       @routes = routes
       @route_class = route_class
       @matcher_class = matcher_class
     end
 
     def route(*args, **opts, &block)
-      opts = { matcher_class: @matcher_class, settings: @settings }.merge(opts)
+      opts = { view_class: @view_class, matcher_class: @matcher_class, settings: @settings }.merge(opts)
       @routes.push @route_class.new(*args, **opts, &block)
     end
 
@@ -61,15 +64,16 @@ module Pluggy
         to: Route::Controller
       }.freeze
 
-      def initialize(verb, uri, matcher_class: nil, settings: Pluggy::Settings.new, **opts, &block)
+      def initialize(verb, uri, matcher_class: nil, view_class: nil, settings: Pluggy::Settings.new, **opts, &block)
         warn "You didn't pass any settings" if settings.nil?
         @settings = settings
+        @view_class = view_class
         @verb = format_verb(verb)
         @uri = format_uri(uri)
         @pattern = matcher_class.new(@uri) if matcher_class.respond_to? :new
         opts = opts.merge(block: block)
         action_class, value = parse_opts(opts)
-        @action = action_class.new(value, mime_type: opts[:mime_type], settings: @settings)
+        @action = action_class.new(value, mime_type: opts[:mime_type], view_class: @view_class, settings: @settings)
       end
 
       # Possibly, eventually, there should be a way to insert custom params

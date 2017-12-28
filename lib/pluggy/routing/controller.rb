@@ -1,12 +1,11 @@
 module Pluggy
   class Router
     class Route
-      class Controller
+      class Controller < Action
         using ConvenienceRefinements
 
-        def initialize(to, mime_type: 'text/html', settings: Pluggy::Settings.new)
-          warn "You didn't pass any settings" if settings.nil?
-          @settings = settings
+        def initialize(to, mime_type: 'text/html', **opts)
+          super(**opts)
           @mime_type = mime_type
           controller, @action_name = to.split('#')
           @controller_name = controller_name_from(controller)
@@ -19,7 +18,7 @@ module Pluggy
           view_files = File.join(view_dir, @controller_name, @action_name.to_s)
           view_file = Dir["#{view_files}*"][0].to_s
           result = @action.call
-          view = View.new(result, filename: view_file, mime_type: @mime_type)
+          view = @view_class.new(result, filename: view_file, mime_type: @mime_type)
           view.compile(@controller.instance_exec { binding })
         end
 
@@ -56,11 +55,11 @@ module Pluggy
         end
 
         def view_dir
-          File.join(@settings[:root], @settings[:view_path])
+          path(@settings[:view_path])
         end
 
         def controller_dir
-          File.join(@settings[:root], @settings[:controller_path])
+          path(@settings[:controller_path])
         end
       end
     end

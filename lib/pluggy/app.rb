@@ -5,9 +5,9 @@ module Pluggy
   class App
     attr_accessor :server, :router
 
-    def initialize(server: Pluggy::Server, router: Pluggy::Router, route: Pluggy::Router::Route, matcher: Mustermann, settings: {})
+    def initialize(server: Pluggy::Server, router: Pluggy::Router, route: Pluggy::Router::Route, view: Pluggy::View, matcher: Mustermann, settings: {})
       @settings = Pluggy::Settings.new(settings)
-      @router = router.new(route_class: route, matcher_class: matcher, settings: @settings)
+      @router = router.new(route_class: route, matcher_class: matcher, view_class: view, settings: @settings)
       @server = server
     end
 
