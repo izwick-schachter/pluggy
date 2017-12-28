@@ -4,7 +4,9 @@ module Pluggy
       class Controller
         using ConvenienceRefinements
 
-        def initialize(to, mime_type: 'text/html')
+        def initialize(to, mime_type: 'text/html', settings: Pluggy::Settings.new)
+          warn "You didn't pass any settings" if settings.nil?
+          @settings = settings
           @mime_type = mime_type
           controller, @action_name = to.split('#')
           @controller_name = controller_name_from(controller)
@@ -50,15 +52,15 @@ module Pluggy
         # Aliases for settings
 
         def controller_suffix
-          Pluggy.settings[:controller_suffix]
+          @settings[:controller_suffix]
         end
 
         def view_dir
-          File.join(Pluggy.settings[:root], Pluggy.settings[:view_path])
+          File.join(@settings[:root], @settings[:view_path])
         end
 
         def controller_dir
-          File.join(Pluggy.settings[:root], Pluggy.settings[:controller_path])
+          File.join(@settings[:root], @settings[:controller_path])
         end
       end
     end

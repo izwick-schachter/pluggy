@@ -1,9 +1,10 @@
 require 'rack'
-require 'webrick'
 
 module Pluggy
   class Server
-    def initialize(router)
+    def initialize(router, settings: Pluggy::Settings.new)
+      warn "You didn't pass any settings" if settings.nil?
+      @settings = settings
       @router = router
     end
 

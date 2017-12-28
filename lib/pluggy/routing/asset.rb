@@ -2,7 +2,9 @@ module Pluggy
   class Router
     class Route
       class Asset
-        def initialize(filename, **_opts)
+        def initialize(filename, settings: Pluggy::Settings.new, **_opts)
+          warn "You didn't pass any settings" if settings.nil?
+          @settings = settings
           @filename = filename
         end
 
@@ -19,7 +21,7 @@ module Pluggy
         private
 
         def asset_dir
-          File.join(Pluggy.settings[:root], Pluggy.settings[:asset_path])
+          File.join(@settings[:root], @settings[:asset_path])
         end
       end
     end

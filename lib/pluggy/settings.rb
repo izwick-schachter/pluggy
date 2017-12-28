@@ -30,7 +30,8 @@ module Pluggy
       }.freeze
     }.freeze
 
-    def initialize(settings = defaults, validations = VALIDATIONS.dup)
+    def initialize(settings = {}, validations = VALIDATIONS.dup)
+      settings = defaults.merge(settings)
       @settings = Hash(settings)
       @validations = Hash(validations)
       @settings.each { |k, v| validate(k, v) }
