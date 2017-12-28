@@ -18,7 +18,7 @@ module Pluggy
           view_files = File.join(view_dir, @controller_name, @action_name.to_s)
           view_file = Dir["#{view_files}*"][0].to_s
           result = @action.call
-          view = @view_class.new(result, filename: view_file, mime_type: @mime_type)
+          view = @view_class.new(result, filename: view_file, mime_type: @mime_type, settings: @settings)
           view.compile(@controller.instance_exec { binding })
         end
 

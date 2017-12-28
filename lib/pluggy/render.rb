@@ -2,9 +2,11 @@ module Pluggy
   class View
     attr_reader :content, :mime_type, :filename
 
-    def initialize(content = nil, mime_type: nil, filename: '')
+    def initialize(content = nil, mime_type: nil, settings: nil, filename: '')
+      warn "No settings passed" if settings.nil?
       content = content.content while content.is_a?(View)
       @content = content
+      @settings = settings
       @file = File.new(filename) if File.exist? filename
       @filename = File.basename filename
       ext = @filename.split('.')[1]
@@ -14,7 +16,7 @@ module Pluggy
     end
 
     def compile(b = TOPLEVEL_BINDING)
-      @content = Compiler.compile(@file, b) unless @file.nil?
+      @content = @settings[:compilers].compile(@file, b) unless @file.nil?
       self
     end
 

@@ -29,7 +29,7 @@ def start
 end
 
 def to_compile(ext, &block)
-  Pluggy::Compiler.new(ext.to_sym, &block)
+  APP.to_compile(ext.to_sym, &block)
 end
 
 to_compile :erb do |t, b|

@@ -10,7 +10,7 @@ module Pluggy
 
         def evaluate(_env, req, params)
           result = @block.call(params, req)
-          @view_class.new(result, mime_type: @mime_type)
+          @view_class.new(result, mime_type: @mime_type, settings: @settings)
         end
       end
     end

@@ -4,7 +4,7 @@ module Pluggy
 
     def defaults
       {
-        compilers: {},
+        compilers: CompilerCollection.new,
         http_verbs: %i[get post put patch delete].freeze,
         view_path: check_filepath('views').freeze,
         controller_path: check_filepath('controllers').freeze,

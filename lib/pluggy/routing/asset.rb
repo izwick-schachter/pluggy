@@ -14,7 +14,7 @@ module Pluggy
           scope.send(:define_method, :req) { req }
           scope.send(:define_method, :env) { env }
           b = scope.new.instance_exec { binding }
-          @view_class.new(file.read, filename: file.to_path).compile(b)
+          @view_class.new(file.read, filename: file.to_path, settings: @settings).compile(b)
         end
 
         private
