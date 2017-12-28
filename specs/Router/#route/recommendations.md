@@ -1,0 +1,1 @@
+It is recommended that it takes arguments of the form `route(verb, uri, *args, &block)`. URI and verb and the typical parameters used for verb retrevial. The method must take a block, for block based routes. If you'd prefer for your router to ignore block based routes, feel free to discard that argument.

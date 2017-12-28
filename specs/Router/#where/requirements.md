@@ -1,0 +1,3 @@
+> **Pending deprecation:** Because find_by is more typically relied upon, this method may be deprecated to keep the specification minimal. In addition, setting precedence should be the job of the Router, and typically only one route will be needed.
+
+This method must take a hash of arguments and search through the Routers routes for all the routes that match, and return them in an Array, sorted by precedence.

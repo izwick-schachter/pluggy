@@ -1,0 +1,1 @@
+This method must return one Route object based on the hash arguments passed.

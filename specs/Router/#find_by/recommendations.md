@@ -1,0 +1,1 @@
+Typically this method takes two hash arguments: `uri` and `verb`. Verb is not always stardardized, so it may make sense to `#downcase#to_sym` it.

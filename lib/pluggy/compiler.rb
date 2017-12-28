@@ -1,25 +1,67 @@
 module Pluggy
+  # Compiler is a class which manages view compilation, from any source.
+  #
+  # It is a built-in for pluggy, not yet decoupled enough to be considered
+  # replaceable.
+  #
+  # @todo Decouple this class to an extent where it can be easily replacable
+  # @example Defining a new compiler
+  #   require 'erb'
+  #
+  #   Compiler.new(:erb) do |text, b|
+  #     ERB.new(text).result(b)
+  #   end
+  # @example Compiling text with ERB
+  #   Compiler.erb("<%= 1+1 %>") #=> "2"
+  # @example Compiling an ERB file
+  #   # foo.html.erb
+  #   <h1>I have a random number for you: <%= rand(0,10) %></h1>
+  #
+  #   # File in same directory
+  #   filepath = File.join(Dir.pwd, 'foo.html.erb')
+  #   Compiler.compile(filepath) #=> "2"
   class Compiler
+    # @param name The name of the compiler, for later access. Symbols are
+    #   prefered, because they play nice with {Compiler#method_missing}.
     def initialize(name, &block)
       Pluggy.settings[:compilers][name] = self
       @block = block
       @name = name.downcase.to_sym
     end
 
+    # Blocks are called in the context that they are created in and are
+    # responsible for managing their own bindings. They should *not* expect to
+    # have instance variables available to them that are in the binding they are
+    # passed.
+    #
+    # @param text The value to be compiled by the compiler. Typically it
+    #   is a {String},   but it can be anything, so long as the compiler @block
+    #   can handle it.
+    # @param [Binding] b Pass a binding which is also forewarded
+    #   to the @block.
     def run(text, b = @block.binding)
       @block.call(text, b)
     end
 
     class << self
+      # Used for the aliasing of {Compiler#run()} to {Compiler.<name>()}
       def method_missing(m, *args, &block)
         return compilers[m].run(*args, &block) if compilers.keys.include?(m)
         super
       end
 
+      # Used for the aliasing of {Compiler#run()} to {Compiler.<name>()}
       def respond_to_missing?(m, *args, &block)
         compilers.keys.include?(m) || super
       end
 
+      # Compiles file with binding b. It also assumes which compilers to use
+      # based on filetype.
+      #
+      # @param [String] file A valid filepath. An error will be thrown if the
+      #   path is not valid
+      # @param [Binding] b The binding in which to compile. This is passed
+      #   directly to {Compiler#run}
       def compile(file, b = TOPLEVEL_BINDING)
         file = File.new(file)
         extensions = File.basename(file).split('.')[1..-1]

@@ -1,0 +1,4 @@
+-M redcarpet
+-m markdown
+-
+specs/*.md

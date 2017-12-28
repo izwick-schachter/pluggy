@@ -5,17 +5,49 @@ require 'pluggy/routing/block'
 require 'pluggy/routing/controller'
 
 module Pluggy
+  # {include:file:specs/Router.md}
   class Router
+    # An array of routes that the {Router} will route to.
     attr_reader :routes
 
+    # Creates a new router, either with no routes or with an array of routes
+    # that are passed to it.
+    #
+    # @note This is part of the specification for {Router}s.
+    #
+    #   {include:file:specs/Router/#initialize/requirements.md}
+    #
+    # @param [Array<Route>] routes The routes to creation the {Router} from.
     def initialize(routes = [])
       @routes = routes
     end
 
-    def route(*args, &block)
-      @routes.push Route.new(*args, &block)
+    # Creates a route that they track. These routes will then be searched in
+    # {where} and {find_by}.
+    #
+    # @note This is part of the specification for {Router}s.
+    #
+    #   {include:file:specs/Router/#route/requirements.md}
+    #
+    # @param [Symbol] verb The HTTP verb that the route should respond to.
+    #   This can also be anything else that the router will parse.
+    # @param [String] uri The uri that should be reponded to. This can also
+    #   be a pattern, or anything else that the router will parse.
+    def route(verb, uri, *args, &block)
+      @routes.push Route.new(verb, uri, *args, &block)
     end
 
+    # The router seaches through its routes based on the options passed to this
+    # method.
+    #
+    # @note This is part of the specification for {Router}s.
+    #
+    #   {include:file:specs/Router/#where/requirements.md}
+    #
+    # @param [#to_s] uri The uri that you're trying to match.
+    # @param [#to_sym] verb The verb you're trying to match.
+    # @param opts The options (e.g. mustermann: true)
+    # @return [Array<Route>]
     def where(uri: nil, verb: nil, **opts)
       verb = verb.downcase.to_sym unless verb.nil?
       uri = uri.to_s unless uri.nil?
@@ -24,6 +56,17 @@ module Pluggy
       end
     end
 
+    # Similar to {#where}, but only returns one route. This is the method where
+    # the {Router} deals with precedence of different routes.
+    #
+    # @note This is part of the specification for {Router}s.
+    #
+    #   {include:file:specs/Router/#find_by/requirements.md}
+    #
+    # @param [#to_s] uri The uri that you're trying to match.
+    # @param [#to_sym] verb The verb you're trying to match.
+    # @param opts The options (e.g. mustermann: true)
+    # @return [Route]
     def find_by(uri: nil, verb: nil, **opts)
       where(uri: uri, verb: verb, **opts).first
     end
@@ -33,6 +76,7 @@ module Pluggy
 
       attr_reader :verb, :uri, :action, :pattern
 
+      # An array which maps route types to their corresponding classes.
       OPT_TO_TYPE = {
         block: Route::Block,
         asset: Route::Asset,

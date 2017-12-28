@@ -1,0 +1,1 @@
+Must generate and store Route objects based on arguments passed to this method. Those must include `verb` as the first argument and `uri` as the second, and optional other arguments may be passed through `*args` (or `**opts` if you'd like to use that).

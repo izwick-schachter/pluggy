@@ -96,6 +96,7 @@ module Pluggy
     end
   end
 
+  # @return [Settings] the global pluggy settings
   def self.settings
     @settings ||= Settings.new
   end
