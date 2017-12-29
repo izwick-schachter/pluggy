@@ -3,8 +3,8 @@ module Pluggy
     class Route
       class Action
         def initialize(settings: Pluggy::Settings.new, view_class: nil, **_opts)
-          warn "No settings given" if settings.nil?
-          throw "No view class given" if view_class.nil?
+          warn 'No settings given' if settings.nil?
+          throw 'No view class given' if view_class.nil?
           @settings = settings
           @view_class = view_class
         end

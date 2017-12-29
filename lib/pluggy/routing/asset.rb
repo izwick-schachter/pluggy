@@ -17,6 +17,10 @@ module Pluggy
           @view_class.new(file.read, filename: file.to_path, settings: @settings).compile(b)
         end
 
+        def self.enabled?(settings)
+          Dir.exist? File.join(settings[:root], settings[:asset_path])
+        end
+
         private
 
         def asset_dir

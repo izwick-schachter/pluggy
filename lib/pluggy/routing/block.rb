@@ -8,6 +8,10 @@ module Pluggy
           @mime_type = mime_type
         end
 
+        def self.enabled?(_settings)
+          true
+        end
+
         def evaluate(_env, req, params)
           result = @block.call(params, req)
           @view_class.new(result, mime_type: @mime_type, settings: @settings)

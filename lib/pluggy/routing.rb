@@ -16,10 +16,10 @@ module Pluggy
 
     attr_accessor :settings
 
-    def initialize(routes = [], route_class: Route, matcher_class: nil, view_class: nil, settings: Pluggy::Settings.new)
-      warn "You did not pass a matcher" if matcher_class.nil?
-      warn "You did not pass any settings" if settings.nil?
-      @settings = settings
+    def initialize(routes = [], route_class: Route, matcher_class: nil, view_class: nil, settings: nil)
+      warn 'You did not pass a matcher' if matcher_class.nil?
+      warn 'You did not pass any settings' if settings.nil?
+      @settings = settings || Pluggy::Settings.new
       @view_class = view_class
       @routes = routes
       @route_class = route_class
@@ -27,7 +27,9 @@ module Pluggy
     end
 
     def route(*args, **opts, &block)
-      opts = { view_class: @view_class, matcher_class: @matcher_class, settings: @settings }.merge(opts)
+      opts = { view_class: @view_class,
+               matcher_class: @matcher_class,
+               settings: @settings }.merge(opts)
       @routes.push @route_class.new(*args, **opts, &block)
     end
 
@@ -64,16 +66,19 @@ module Pluggy
         to: Route::Controller
       }.freeze
 
-      def initialize(verb, uri, matcher_class: nil, view_class: nil, settings: Pluggy::Settings.new, **opts, &block)
+      def initialize(verb, uri, matcher_class: nil, view_class: nil, settings: nil, **opts, &block)
         warn "You didn't pass any settings" if settings.nil?
-        @settings = settings
+        @settings = settings || Pluggy::Settings.new
         @view_class = view_class
         @verb = format_verb(verb)
         @uri = format_uri(uri)
         @pattern = matcher_class.new(@uri) if matcher_class.respond_to? :new
         opts = opts.merge(block: block)
         action_class, value = parse_opts(opts)
-        @action = action_class.new(value, mime_type: opts[:mime_type], view_class: @view_class, settings: @settings)
+        warn "#{action_class} disabled" unless action_class.enabled?(@settings)
+        @action = action_class.new(value, mime_type: opts[:mime_type],
+                                          view_class: @view_class,
+                                          settings: @settings)
       end
 
       # Possibly, eventually, there should be a way to insert custom params
