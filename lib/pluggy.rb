@@ -12,12 +12,12 @@ require 'pluggy/controller'
 
 require 'pluggy/initializers'
 
-module Pluggy
-  settings[:router] = Router.new
-end
+require 'pluggy/app'
+
+APP = Pluggy::App.new
 
 def route(*args, **opts, &block)
-  Pluggy.settings[:router].route(*args, **opts, &block)
+  APP.route(*args, **opts, &block)
 end
 
 def get(*args, **opts, &block)
@@ -25,15 +25,11 @@ def get(*args, **opts, &block)
 end
 
 def start
-  Rack::Server.start(
-    app: Pluggy::Server.new(Pluggy.settings[:router]),
-    server: WEBrick,
-    port: 3150
-  )
+  APP.start
 end
 
 def to_compile(ext, &block)
-  Pluggy::Compiler.new(ext.to_sym, &block)
+  APP.to_compile(ext.to_sym, &block)
 end
 
 to_compile :erb do |t, b|

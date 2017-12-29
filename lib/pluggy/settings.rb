@@ -1,103 +1,97 @@
 module Pluggy
-  class Settings
-    using ConvenienceRefinements
+  class Setting
+    attr_reader :name, :validation, :value
 
-    def defaults
-      {
-        compilers: {},
-        http_verbs: %i[get post put patch delete].freeze,
-        view_path: check_filepath('views').freeze,
-        controller_path: check_filepath('controllers').freeze,
-        asset_path: check_filepath('assets').freeze,
-        controller_suffix: '_controller'.freeze,
-        default_mime_type: 'text/html'.freeze,
-        root: root
-      }
+    def initialize(setting, locked: false, &validation)
+      setting = setting.to_a[0]
+      @name = setting[0]
+      @value = setting[1]
+      @locked = locked
+      @value.freeze if @locked
+      @initial_value = value.freeze
+      @validation = block_given? ? validation : proc { true }
     end
 
-    VALIDATIONS = {
-      root: proc { |root|
-        Dir.exist? root
-      }.freeze,
-      view_path: proc { |views|
-        views.nil? || Dir.exist?(File.join(get(:root), views))
-      }.freeze,
-      controller_path: proc { |controllers|
-        controllers.nil? || Dir.exist?(File.join(get(:root), controllers))
-      }.freeze,
-      asset_path: proc { |assets|
-        assets.nil? || Dir.exist?(File.join(get(:root), assets))
-      }.freeze
-    }.freeze
-
-    def initialize(settings = defaults, validations = VALIDATIONS.dup)
-      @settings = Hash(settings)
-      @validations = Hash(validations)
-      @settings.each { |k, v| validate(k, v) }
-    end
-
-    def enable(setting)
-      validate(setting, true)
-      @settings[setting] = true
-    end
-
-    def disable(setting)
-      validate(setting, false)
-      @settings[setting] = false
-    end
-
-    def set(key, value)
-      validate(key, value)
-      @settings[key] = value
-    end
-
-    def get(key)
-      @settings[key]
-    end
-
-    def clear(key)
-      @settings.delete(key)
+    def value=(new_val)
+      warn "The #{@name} setting has been locked" if @locked
+      @value = new_val if !@locked && @validation.call(new_val)
     end
 
     def reset
-      @settings = defaults
+      @value = @initial_value
     end
 
-    def [](key)
-      warning = "Tried to access uninitialized setting #{key}"
-      warn warning unless @settings.keys.include? key
-      @settings[key]
+    def method_missing(m, *args, &block)
+      @value.respond_to?(m) ? @value.method(m).call(*args, &block) : super
     end
 
-    def []=(key, value)
-      validate(key, value)
-      @settings[key] = value
-    end
-
-    private
-
-    def validate(setting, value)
-      error = "Invalid value #{value} for #{setting}"
-      # Should be valid if validation doesn't exist
-      validation = @validations[setting] || proc { true }
-      throw error unless instance_exec(value, &validation)
-    end
-
-    def root
-      Dir.pwd.freeze
-    end
-
-    def check_filepath(path, name: nil)
-      warning = "#{name || path.to_s.titleize} pulling functionality with " \
-                "not work as defined due to the #{path} directory not existing."
-      file_exists = File.exist? File.join(root, path)
-      warn warning unless file_exists
-      file_exists ? path : nil
+    def respond_to_missing?(m, *args, &block)
+      @value.respond_to?(m) || super
     end
   end
 
-  # @return [Settings] the global pluggy settings
-  def self.settings
-    @settings ||= Settings.new
+  class Settings
+    attr_reader :settings
+
+    def defaults
+      [
+        Setting.new(compilers: CompilerCollection.new),
+        Setting.new(http_verbs: %i[get post put patch delete].freeze),
+        Setting.new(root: Dir.pwd, locked: true),
+        Setting.new(view_path: 'views'),
+        Setting.new(controller_path: 'controllers'),
+        Setting.new(asset_path: 'assets'),
+        Setting.new(controller_suffix: '_controller'),
+        Setting.new(default_mime_type: 'text/html')
+      ]
+    end
+
+    def initialize(settings = [])
+      invalid_settings = 'Invalid settings passed'
+      throw invalid_settings unless settings.all? { |s| s.is_a? Setting }
+      @settings = settings + defaults.reject do |setting|
+        settings.map(&:name).include?(setting.name)
+      end
+    end
+
+    def reset
+      @settings.map(&:reset)
+    end
+
+    def keys
+      @settings.map(&:name)
+    end
+
+    def values
+      @settings.map(&:value)
+    end
+
+    def [](name)
+      get(name)
+    end
+
+    def get_setting(name)
+      @settings.select { |s| s.name == name }[0]
+    end
+
+    def get(name)
+      get_setting(name).value
+    end
+
+    def []=(name, value)
+      set(name, value)
+    end
+
+    def set(name, value)
+      get(name).value = value
+    end
+
+    def enable(name)
+      set(name, true)
+    end
+
+    def disable(name)
+      set(name, false)
+    end
   end
 end

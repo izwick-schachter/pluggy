@@ -1,10 +1,11 @@
 module Pluggy
   class Router
     class Route
-      class Controller
+      class Controller < Action
         using ConvenienceRefinements
 
-        def initialize(to, mime_type: 'text/html')
+        def initialize(to, mime_type: 'text/html', **opts)
+          super(**opts)
           @mime_type = mime_type
           controller, @action_name = to.split('#')
           @controller_name = controller_name_from(controller)
@@ -15,10 +16,16 @@ module Pluggy
         def evaluate(env, req, params)
           controller_vars(params: params, env: env, req: req)
           view_files = File.join(view_dir, @controller_name, @action_name.to_s)
-          view_file = Dir["#{view_files}*"][0].to_s
+          view_file = Dir["#{view_files}*"][0]
+          warn "Could not find view file with pattern #{view_files}. Rendering empty view." if view_file.nil?
           result = @action.call
-          view = View.new(result, filename: view_file, mime_type: @mime_type)
+          view = @view_class.new(result, filename: view_file.to_s, mime_type: @mime_type, settings: @settings)
           view.compile(@controller.instance_exec { binding })
+        end
+
+        def self.enabled?(settings)
+          Dir.exist?(File.join(settings[:root], settings[:view_path])) &&
+            Dir.exist?(File.join(settings[:root], settings[:controller_path]))
         end
 
         private
@@ -30,7 +37,11 @@ module Pluggy
         def load_controller(controller_name)
           controller_file_basename = "#{controller_name}#{controller_suffix}.rb"
           file = File.join(controller_dir, controller_file_basename)
-          load file if File.exist? file
+          if File.exist? file
+            load file
+          else
+            warn "Controller at #{file} does not exist"
+          end
         end
 
         def controller_action_from(controller, action)
@@ -50,15 +61,15 @@ module Pluggy
         # Aliases for settings
 
         def controller_suffix
-          Pluggy.settings[:controller_suffix]
+          @settings[:controller_suffix]
         end
 
         def view_dir
-          File.join(Pluggy.settings[:root], Pluggy.settings[:view_path])
+          path(@settings[:view_path])
         end
 
         def controller_dir
-          File.join(Pluggy.settings[:root], Pluggy.settings[:controller_path])
+          path(@settings[:controller_path])
         end
       end
     end

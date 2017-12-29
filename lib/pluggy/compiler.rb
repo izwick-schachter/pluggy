@@ -23,8 +23,9 @@ module Pluggy
   class Compiler
     # @param name The name of the compiler, for later access. Symbols are
     #   prefered, because they play nice with {Compiler#method_missing}.
+    attr_reader :name
+
     def initialize(name, &block)
-      Pluggy.settings[:compilers][name] = self
       @block = block
       @name = name.downcase.to_sym
     end
@@ -42,40 +43,60 @@ module Pluggy
     def run(text, b = @block.binding)
       @block.call(text, b)
     end
+  end
 
-    class << self
-      # Used for the aliasing of {Compiler#run()} to {Compiler.<name>()}
-      def method_missing(m, *args, &block)
-        return compilers[m].run(*args, &block) if compilers.keys.include?(m)
-        super
+  class CompilerCollection
+    def initialize
+      @compilers = []
+    end
+
+    def create(name, &block)
+      @compilers.push Compiler.new(name, &block)
+    end
+
+    def [](name)
+      compiler(name)
+    end
+
+    # Used for the aliasing of {Compiler#run()} to {Compiler.<name>()}
+    def method_missing(m, *args, &block)
+      return compiler(m).run(*args, &block) if compiler_names.include?(m)
+      super
+    end
+
+    # Used for the aliasing of {Compiler#run()} to {Compiler.<name>()}
+    def respond_to_missing?(m, *args, &block)
+      compiler_names.include?(m) || super
+    end
+
+    # Compiles file with binding b. It also assumes which compilers to use
+    # based on filetype.
+    #
+    # @param [String] file A valid filepath. An error will be thrown if the
+    #   path is not valid
+    # @param [Binding] b The binding in which to compile. This is passed
+    #   directly to {Compiler#run}
+    def compile(file, b = TOPLEVEL_BINDING)
+      file = File.new(file)
+      extensions = File.basename(file).split('.')[1..-1]
+      valid_exts = extensions.map(&:to_sym) & compiler_names.map(&:to_sym)
+      valid_exts.inject(file.read) do |content, ext|
+        compiler(ext).run(content, b)
       end
+    end
 
-      # Used for the aliasing of {Compiler#run()} to {Compiler.<name>()}
-      def respond_to_missing?(m, *args, &block)
-        compilers.keys.include?(m) || super
-      end
+    private
 
-      # Compiles file with binding b. It also assumes which compilers to use
-      # based on filetype.
-      #
-      # @param [String] file A valid filepath. An error will be thrown if the
-      #   path is not valid
-      # @param [Binding] b The binding in which to compile. This is passed
-      #   directly to {Compiler#run}
-      def compile(file, b = TOPLEVEL_BINDING)
-        file = File.new(file)
-        extensions = File.basename(file).split('.')[1..-1]
-        valid_exts = extensions.map(&:to_sym) & compilers.keys.map(&:to_sym)
-        valid_exts.inject(file.read) do |content, ext|
-          compilers[ext].run(content, b)
-        end
-      end
+    def compilers(name)
+      @compilers.select { |compiler| compiler.name == name }
+    end
 
-      private
+    def compiler(name)
+      @compilers.select { |compiler| compiler.name == name }[0]
+    end
 
-      def compilers
-        Pluggy.settings[:compilers]
-      end
+    def compiler_names
+      @compilers.map(&:name)
     end
   end
 end
