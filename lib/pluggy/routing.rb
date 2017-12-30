@@ -93,11 +93,11 @@ module Pluggy
 
       # An array which maps route types to their corresponding classes.
       # @todo Possibly this should be delegated to {Router}
-      OPT_TO_TYPE = {
-        block: Route::Block,
-        asset: Route::Asset,
-        to: Route::Controller
-      }.freeze
+      OPT_TO_TYPE = [
+        [:asset, Route::Asset],
+        [:block, Route::Block],
+        [:to, Route::Controller]
+      ].freeze
 
       # @spec
       #
@@ -120,7 +120,7 @@ module Pluggy
         warn "#{action_class} disabled" unless action_class.enabled?(@settings)
         @action = action_class.new(value, mime_type: opts[:mime_type],
                                           view_class: @view_class,
-                                          settings: @settings)
+                                          settings: @settings, **opts)
       end
 
       # @spec
@@ -165,12 +165,13 @@ module Pluggy
       private
 
       def parse_opts(opts)
-        opt = opts.select { |k, v| OPT_TO_TYPE.keys.include?(k) && !v.nil? }
+        opt = OPT_TO_TYPE.select { |k, v| opts.keys.include?(k) && !opts[k].nil? }
         error = 'No action, asset or block passed'
-        throw error unless opt.length == 1
-        key, value = opt.flatten
+        throw error unless opt.length >= 1
+        warn 'More than one action class matched' if opt.length > 1
+        key, action_class = opt[0]
         # [action_class, value]
-        [OPT_TO_TYPE[key], value]
+        [action_class, opts[key]]
       end
 
       def format_uri(uri)

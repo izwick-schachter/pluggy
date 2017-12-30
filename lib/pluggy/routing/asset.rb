@@ -2,9 +2,10 @@ module Pluggy
   class Router
     class Route
       class Asset < Action
-        def initialize(filename, **opts)
+        def initialize(filename, block: nil, **opts)
           super(**opts)
           @filename = filename
+          @block = block
         end
 
         def evaluate(env, req, params)
@@ -13,7 +14,9 @@ module Pluggy
           scope.send(:define_method, :params) { params }
           scope.send(:define_method, :req) { req }
           scope.send(:define_method, :env) { env }
-          b = scope.new.instance_exec { binding }
+          inst = scope.new
+          inst.instance_exec(&@block) unless @block.nil?
+          b = inst.instance_exec { binding }
           @view_class.new(file.read, filename: file.to_path, settings: @settings).compile(b)
         end
 
