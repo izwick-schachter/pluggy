@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: Router
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Router";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: Router</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><h1>Router Spec</h1>
+
+<h2>Structure Recommendations</h2>
+
+<p>The job of a Router is to create Route objects, store them (typically in an Array of Route objects), and retrieve routes based on parameters passed from the server (typically a URI and an HTTP Verb).</p>
+
+<p>Therefore, it is recommended that the #initialize method take an Array of Route objects to begin with, and that the #route method generate Routes and append them to an internal routes array.It is also recommened that this Routes array be exposed via an attr_reader.</p>
+
+<h2>Sub-Specs</h2>
+
+<p>In order to be fully compatible with the Pluggy spec, the <code>#initialize</code> method must accept a <code>route_class:</code> keyword argument, which should accept any Route compatible with the Route spec.</p>
+
+<p>It should also accept <code>view_class:</code> and <code>matcher_class:</code> keyword arguments to pass on to its Routes.</p>
+
+<h2>Methods</h2>
+
+<p><h3>#initialize</h3>
+
+<p>Must be able to be instantiated.</p>
+
+<h4>Recommendations</h4>
+
+<p>Take an Array of Route objects to create the Router with as the first argument.</p>
+
+<p><h3>#route</h3>
+
+<p>Must generate and store Route objects based on arguments passed to this method. Those must include <code>verb</code> as the first argument and <code>uri</code> as the second, and optional other arguments may be passed through <code>*args</code> (or <code>**opts</code> if you&#39;d like to use that).</p>
+
+<h4>Recommendations</h4>
+
+<p>It is recommended that it takes arguments of the form <code>route(verb, uri, *args, &amp;block)</code>. URI and verb and the typical parameters used for verb retrevial. The method must take a block, for block based routes. If you&#39;d prefer for your router to ignore block based routes, feel free to discard that argument.</p>
+
+<p><h3>#where</h3>
+
+<p><blockquote>
+<p><strong>Pending deprecation:</strong> Because find_by is more typically relied upon, this method may be deprecated to keep the specification minimal. In addition, setting precedence should be the job of the Router, and typically only one route will be needed.</p>
+</blockquote>
+
+<p>This method must take a hash of arguments and search through the Routers routes for all the routes that match, and return them in an Array, sorted by precedence.</p>
+
+<h4>Recommendations</h4>
+
+<p>Typically, the two arguments are <code>uri</code> and <code>verb</code>.</p>
+
+<p><h3>#find_by</h3>
+
+<p>This method must return one Route object based on the hash arguments passed.</p>
+
+<h4>Recommendations</h4>
+
+<p>Typically this method takes two hash arguments: <code>uri</code> and <code>verb</code>. Verb is not always stardardized, so it may make sense to <code>#downcase#to_sym</code> it.</p>
+</div></div>
+
+      <div id="footer">
+  Generated on Fri Dec 29 20:43:53 2017 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.3.3).
+</div>
+
+    </div>
+  </body>
+</html>

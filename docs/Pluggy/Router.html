@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Pluggy::Router
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Pluggy::Router";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Pluggy.html" title="Pluggy (module)">Pluggy</a></span></span>
+     &raquo; 
+    <span class="title">Router</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Pluggy::Router
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Pluggy::Router</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/pluggy/routing.rb<span class="defines">,<br />
+  lib/pluggy/routing/asset.rb,<br /> lib/pluggy/routing/block.rb,<br /> lib/pluggy/routing/action.rb,<br /> lib/pluggy/routing/controller.rb</span>
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Here&#39;s an interesting thing about Matchers -- by default they use
+the Router&#39;s matcher_class, but sometimes they can have a custom matcher.
+Checking if a Route is matched is up to the Route, <strong>not</strong> the router. A
+router <em>could</em> steal that power by checking the Route itself and checking
+matches there, but then it&#39;d have to manipulate req and env to insert the
+path params in.</p>
+</div>
+  </div>
+
+<p><h1>Router Spec</h1>
+
+<h2>Structure Recommendations</h2>
+
+<p>The job of a Router is to create Route objects, store them (typically in an Array of Route objects), and retrieve routes based on parameters passed from the server (typically a URI and an HTTP Verb).</p>
+
+<p>Therefore, it is recommended that the #initialize method take an Array of Route objects to begin with, and that the #route method generate Routes and append them to an internal routes array.It is also recommened that this Routes array be exposed via an attr_reader.</p>
+
+<h2>Sub-Specs</h2>
+
+<p>In order to be fully compatible with the Pluggy spec, the <code>#initialize</code> method must accept a <code>route_class:</code> keyword argument, which should accept any Route compatible with the Route spec.</p>
+
+<p>It should also accept <code>view_class:</code> and <code>matcher_class:</code> keyword arguments to pass on to its Routes.</p>
+
+<h2>Methods</h2>
+
+<p><h3>#initialize</h3>
+
+<p>Must be able to be instantiated.</p>
+
+<h4>Recommendations</h4>
+
+<p>Take an Array of Route objects to create the Router with as the first argument.</p>
+
+<p><h3>#route</h3>
+
+<p>Must generate and store Route objects based on arguments passed to this method. Those must include <code>verb</code> as the first argument and <code>uri</code> as the second, and optional other arguments may be passed through <code>*args</code> (or <code>**opts</code> if you&#39;d like to use that).</p>
+
+<h4>Recommendations</h4>
+
+<p>It is recommended that it takes arguments of the form <code>route(verb, uri, *args, &amp;block)</code>. URI and verb and the typical parameters used for verb retrevial. The method must take a block, for block based routes. If you&#39;d prefer for your router to ignore block based routes, feel free to discard that argument.</p>
+
+<p><h3>#where</h3>
+
+<p><blockquote>
+<p><strong>Pending deprecation:</strong> Because find_by is more typically relied upon, this method may be deprecated to keep the specification minimal. In addition, setting precedence should be the job of the Router, and typically only one route will be needed.</p>
+</blockquote>
+
+<p>This method must take a hash of arguments and search through the Routers routes for all the routes that match, and return them in an Array, sorted by precedence.</p>
+
+<h4>Recommendations</h4>
+
+<p>Typically, the two arguments are <code>uri</code> and <code>verb</code>.</p>
+
+<p><h3>#find_by</h3>
+
+<p>This method must return one Route object based on the hash arguments passed.</p>
+
+<h4>Recommendations</h4>
+
+<p>Typically this method takes two hash arguments: <code>uri</code> and <code>verb</code>. Verb is not always stardardized, so it may make sense to <code>#downcase#to_sym</code> it.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Router/Route.html" title="Pluggy::Router::Route (class)">Route</a></span>
+    
+  
+</p>
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#routes-instance_method" title="#routes (instance method)">#<strong>routes</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>An array of routes that the <span class='object_link'><a href="" title="Pluggy::Router (class)">Router</a></span> will route to.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#settings-instance_method" title="#settings (instance method)">#<strong>settings</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute settings.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#find_by-instance_method" title="#find_by (instance method)">#<strong>find_by</strong>(uri: nil, verb: nil, **opts)  &#x21d2; Route </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Similar to <span class='object_link'><a href="#where-instance_method" title="Pluggy::Router#where (method)">#where</a></span>, but only returns one route.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(routes = [], route_class: Route, matcher_class: nil, view_class: nil, settings: nil)  &#x21d2; Router </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new router, either with no routes or with an array of routes that are passed to it.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#route-instance_method" title="#route (instance method)">#<strong>route</strong>(*args, **opts, &amp;block)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a route that the router will track.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#where-instance_method" title="#where (instance method)">#<strong>where</strong>(uri: nil, verb: nil, **opts)  &#x21d2; Array&lt;Route&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The router seaches through its routes based on the options passed to this method.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(routes = [], route_class: Route, matcher_class: nil, view_class: nil, settings: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Pluggy::Router (class)">Router</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This is part of the specification for <span class='object_link'><a href="" title="Pluggy::Router (class)">Pluggy::Router</a></span>s.</p>
+
+<p>Must be able to be instantiated.</p>
+</div>
+  </div>
+
+<p>Creates a new router, either with no routes or with an array of routes
+that are passed to it.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>routes</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Router/Route.html" title="Pluggy::Router::Route (class)">Route</a></span>&gt;</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The routes to create the <span class='object_link'><a href="" title="Pluggy::Router (class)">Pluggy::Router</a></span> from.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28
+29
+30
+31
+32
+33
+34</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 26</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_routes'>routes</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>route_class:</span> <span class='const'><span class='object_link'><a href="Router/Route.html" title="Pluggy::Router::Route (class)">Route</a></span></span><span class='comma'>,</span> <span class='label'>matcher_class:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>view_class:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>settings:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>You did not pass a matcher</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_matcher_class'>matcher_class</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>You did not pass any settings</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_settings'>settings</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='ivar'>@settings</span> <span class='op'>=</span> <span class='id identifier rubyid_settings'>settings</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="../Pluggy.html" title="Pluggy (module)">Pluggy</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Settings.html" title="Pluggy::Settings (class)">Settings</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Settings.html#initialize-instance_method" title="Pluggy::Settings#initialize (method)">new</a></span></span>
+  <span class='ivar'>@view_class</span> <span class='op'>=</span> <span class='id identifier rubyid_view_class'>view_class</span>
+  <span class='ivar'>@routes</span> <span class='op'>=</span> <span class='id identifier rubyid_routes'>routes</span>
+  <span class='ivar'>@route_class</span> <span class='op'>=</span> <span class='id identifier rubyid_route_class'>route_class</span>
+  <span class='ivar'>@matcher_class</span> <span class='op'>=</span> <span class='id identifier rubyid_matcher_class'>matcher_class</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="routes-instance_method">
+  
+    #<strong>routes</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>An array of routes that the <span class='object_link'><a href="" title="Pluggy::Router (class)">Pluggy::Router</a></span> will route to.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+18
+19
+20</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 18</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_routes'>routes</span>
+  <span class='ivar'>@routes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id="settings=-instance_method"></span>
+      <div class="method_details ">
+  <h3 class="signature " id="settings-instance_method">
+  
+    #<strong>settings</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute settings</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+19
+20
+21</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 19</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_settings'>settings</span>
+  <span class='ivar'>@settings</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="find_by-instance_method">
+  
+    #<strong>find_by</strong>(uri: nil, verb: nil, **opts)  &#x21d2; <tt><span class='object_link'><a href="Router/Route.html" title="Pluggy::Router::Route (class)">Route</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This is part of the specification for <span class='object_link'><a href="" title="Pluggy::Router (class)">Pluggy::Router</a></span>s.</p>
+
+<p>This method must return one Route object based on the hash arguments passed.</p>
+</div>
+  </div>
+
+<p>Similar to <span class='object_link'><a href="#where-instance_method" title="Pluggy::Router#where (method)">#where</a></span>, but only returns one route. This is the method where
+the <span class='object_link'><a href="" title="Pluggy::Router (class)">Pluggy::Router</a></span> deals with precedence of different routes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>uri</span>
+      
+      
+        <span class='type'>(<tt>#to_s</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The uri that you&#39;re trying to match.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>verb</span>
+      
+      
+        <span class='type'>(<tt>#to_sym</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The verb you&#39;re trying to match.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>opts</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The options (e.g. mustermann: true)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Router/Route.html" title="Pluggy::Router::Route (class)">Route</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+74
+75
+76</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 74</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_find_by'>find_by</span><span class='lparen'>(</span><span class='label'>uri:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>verb:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>uri:</span> <span class='id identifier rubyid_uri'>uri</span><span class='comma'>,</span> <span class='label'>verb:</span> <span class='id identifier rubyid_verb'>verb</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="route-instance_method">
+  
+    #<strong>route</strong>(*args, **opts, &amp;block)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This is part of the specification for <span class='object_link'><a href="" title="Pluggy::Router (class)">Pluggy::Router</a></span>s.</p>
+
+<p>Must generate and store Route objects based on arguments passed to this method. Those must include <code>verb</code> as the first argument and <code>uri</code> as the second, and optional other arguments may be passed through <code>*args</code> (or <code>**opts</code> if you&#39;d like to use that).</p>
+</div>
+  </div>
+
+<p>Creates a route that the router will track. These routes will then be
+searched in <span class='object_link'><a href="#where-instance_method" title="Pluggy::Router#where (method)">#where</a></span> and <span class='object_link'><a href="#find_by-instance_method" title="Pluggy::Router#find_by (method)">#find_by</a></span>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>documentation for {Route#initialize}, because arguments to
+this method are passed directly to {Route#initialize}.</li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_route'><span class='object_link'><a href="../top-level-namespace.html#route-instance_method" title="#route (method)">route</a></span></span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span> <span class='label'>view_class:</span> <span class='ivar'>@view_class</span><span class='comma'>,</span>
+           <span class='label'>matcher_class:</span> <span class='ivar'>@matcher_class</span><span class='comma'>,</span>
+           <span class='label'>settings:</span> <span class='ivar'>@settings</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='ivar'>@routes</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span> <span class='ivar'>@route_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="where-instance_method">
+  
+    #<strong>where</strong>(uri: nil, verb: nil, **opts)  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="Router/Route.html" title="Pluggy::Router::Route (class)">Route</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This is part of the specification for <span class='object_link'><a href="" title="Pluggy::Router (class)">Pluggy::Router</a></span>s.</p>
+
+<p><blockquote>
+<p><strong>Pending deprecation:</strong> Because find_by is more typically relied upon, this method may be deprecated to keep the specification minimal. In addition, setting precedence should be the job of the Router, and typically only one route will be needed.</p>
+</blockquote>
+
+<p>This method must take a hash of arguments and search through the Routers routes for all the routes that match, and return them in an Array, sorted by precedence.</p>
+</div>
+  </div>
+
+<p>The router seaches through its routes based on the options passed to this
+method.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>uri</span>
+      
+      
+        <span class='type'>(<tt>#to_s</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The uri that you&#39;re trying to match.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>verb</span>
+      
+      
+        <span class='type'>(<tt>#to_sym</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The verb you&#39;re trying to match.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>opts</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The options (e.g. mustermann: true)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Router/Route.html" title="Pluggy::Router::Route (class)">Route</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+58
+59
+60
+61
+62
+63
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 58</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='label'>uri:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>verb:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_verb'>verb</span> <span class='op'>=</span> <span class='id identifier rubyid_verb'>verb</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='kw'>unless</span> <span class='id identifier rubyid_verb'>verb</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_uri'>uri</span> <span class='op'>=</span> <span class='id identifier rubyid_uri'>uri</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>unless</span> <span class='id identifier rubyid_uri'>uri</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='ivar'>@routes</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_route'><span class='object_link'><a href="../top-level-namespace.html#route-instance_method" title="#route (method)">route</a></span></span><span class='op'>|</span>
+    <span class='id identifier rubyid_route'><span class='object_link'><a href="../top-level-namespace.html#route-instance_method" title="#route (method)">route</a></span></span><span class='period'>.</span><span class='id identifier rubyid_matches?'>matches?</span><span class='lparen'>(</span><span class='label'>uri:</span> <span class='id identifier rubyid_uri'>uri</span><span class='comma'>,</span> <span class='label'>verb:</span> <span class='id identifier rubyid_verb'>verb</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Dec 29 20:43:54 2017 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.3.3).
+</div>
+
+    </div>
+  </body>
+</html>

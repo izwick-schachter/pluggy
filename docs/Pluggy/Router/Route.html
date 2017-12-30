@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Pluggy::Router::Route
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Pluggy::Router::Route";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Pluggy.html" title="Pluggy (module)">Pluggy</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Router.html" title="Pluggy::Router (class)">Router</a></span></span>
+     &raquo; 
+    <span class="title">Route</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Pluggy::Router::Route
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Pluggy::Router::Route</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/pluggy/routing.rb<span class="defines">,<br />
+  lib/pluggy/routing/asset.rb,<br /> lib/pluggy/routing/block.rb,<br /> lib/pluggy/routing/action.rb,<br /> lib/pluggy/routing/controller.rb</span>
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p><h1>Router Spec</h1>
+
+<h2>Structure Recommendations</h2>
+
+<p>A Route object is responsible for checking if it matches a URI and HTTP Verb (this responsibility is shared with the Router), and is reponsible for generating a view from <code>env</code> and <code>req</code>.</p>
+
+<h2>Sub-Specs</h2>
+
+<p>To be fully compatible with the Pluggy spec, the <code>#initialize</code> method must accept a <code>view_class:</code> keyword argument containing any view class which is compatible with the Pluggy view spec. In addition, it must accept a <code>matcher_class:</code> keyword argument containing any matcher class which is compatible with the Pluggy matcher spec.</p>
+
+<h2>Methods</h2>
+
+<p><h3>#initialize</h3>
+
+<p>It must be able to be instantated, taking arguments (in order):</p>
+
+<ul>
+<li><code>verb</code>: The HTTP verb the route should respond to.</li>
+<li><code>uri</code>: The URI that the route should respond to.</li>
+</ul>
+</p>
+
+<h4>Recommendations</h4>
+
+<p>It should standardize the <code>verb</code> and <code>uri</code> in some way, and additionally it should take <code>matcher_class:</code>, <code>view_class:</code>, and <code>settings:</code> keyword arguments in order to be compatible with the respective sub-specs. Typically, on initialization, a Route will generate an instance of an ActionClass which becomes responsible for actually evaluating the route.</p>
+
+<p><h3>#evaluate_with</h3>
+
+<p>It must take two arguments (env (a hash) and req (a Rack::Request)) and return a View based on the env and other stored information in the Route.</p>
+
+<h4>Recommendations</h4>
+
+<p>Typically this method is simply a wrapper for the ActionClass and also is responsible for pulling the params out of the env/req and path.</p>
+
+<p><h3>#match?</h3>
+
+<p>It must take a hash, and using that hash must return a truthy or falsy value depending of weather that route matched the hash passed.</p>
+
+<h4>Recommendations</h4>
+
+<p>The hash will typically contiain <code>uri</code> and <code>verb</code>, which are the things to be checked against. It is also typical to provide public helper methods, <code>matches_uri?</code> and <code>matches_verb?</code> (each taking one argument) to allow easier testing.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Route/Action.html" title="Pluggy::Router::Route::Action (class)">Action</a></span>, <span class='object_link'><a href="Route/Asset.html" title="Pluggy::Router::Route::Asset (class)">Asset</a></span>, <span class='object_link'><a href="Route/Block.html" title="Pluggy::Router::Route::Block (class)">Block</a></span>, <span class='object_link'><a href="Route/Controller.html" title="Pluggy::Router::Route::Controller (class)">Controller</a></span>
+    
+  
+</p>
+
+  <h2>Constant Summary</h2>
+  <dl class="constants">
+    
+      <dt id="OPT_TO_TYPE-constant" class="">OPT_TO_TYPE =
+        <div class="docstring">
+  <div class="discussion">
+    
+  <div class="note todo">
+    <strong>TODO:</strong>
+    <div class='inline'><p>Possibly this should be delegated to <span class='object_link'><a href="../Router.html" title="Pluggy::Router (class)">Pluggy::Router</a></span></p>
+</div>
+  </div>
+
+<p>An array which maps route types to their corresponding classes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+      </dt>
+      <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>block:</span> <span class='const'>Route</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Route/Block.html" title="Pluggy::Router::Route::Block (class)">Block</a></span></span><span class='comma'>,</span>
+  <span class='label'>asset:</span> <span class='const'>Route</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Route/Asset.html" title="Pluggy::Router::Route::Asset (class)">Asset</a></span></span><span class='comma'>,</span>
+  <span class='label'>to:</span> <span class='const'>Route</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Route/Controller.html" title="Pluggy::Router::Route::Controller (class)">Controller</a></span></span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+    
+  </dl>
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#action-instance_method" title="#action (instance method)">#<strong>action</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute action.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pattern-instance_method" title="#pattern (instance method)">#<strong>pattern</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute pattern.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#uri-instance_method" title="#uri (instance method)">#<strong>uri</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute uri.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#verb-instance_method" title="#verb (instance method)">#<strong>verb</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute verb.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#evaluate_with-instance_method" title="#evaluate_with (instance method)">#<strong>evaluate_with</strong>(env, req = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Possibly, eventually, there should be a way to insert custom params injected by the router.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(verb, uri, matcher_class: nil, view_class: nil, settings: nil, **opts, &amp;block)  &#x21d2; Route </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of Route.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#matches%3F-instance_method" title="#matches? (instance method)">#<strong>matches?</strong>(uri: nil, verb: nil, **opts)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#matches_uri%3F-instance_method" title="#matches_uri? (instance method)">#<strong>matches_uri?</strong>(uri, **_opts)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A helper method for <span class='object_link'><a href="#matches%3F-instance_method" title="Pluggy::Router::Route#matches? (method)">#matches?</a></span>.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#matches_verb%3F-instance_method" title="#matches_verb? (instance method)">#<strong>matches_verb?</strong>(verb = nil, **_opts)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A helper method for <span class='object_link'><a href="#matches%3F-instance_method" title="Pluggy::Router::Route#matches? (method)">#matches?</a></span>.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(verb, uri, matcher_class: nil, view_class: nil, settings: nil, **opts, &amp;block)  &#x21d2; <tt><span class='object_link'><a href="" title="Pluggy::Router::Route (class)">Route</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This is part of the specification for <span class='object_link'><a href="" title="Pluggy::Router::Route (class)">Pluggy::Router::Route</a></span>s.</p>
+
+<p>Must be able to be instantiated.</p>
+</div>
+  </div>
+
+<p>Returns a new instance of Route</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>verb</span>
+      
+      
+        <span class='type'>(<tt>#to_sym</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The HTTP verb the route should respond to.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>uri</span>
+      
+      
+        <span class='type'>(<tt>#to_s</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The URI the route should respond to.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>matcher_class</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>A matcher class which follows the matcher class
+spec. By default, Mustermann.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>view_class</span>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>A view class which follows the view class spec. By
+default, the <span class='object_link'><a href="../View.html" title="Pluggy::View (class)">View</a></span> class.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>settings</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Settings.html" title="Pluggy::Settings (class)">Pluggy::Settings</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The settings to run the route under.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 111</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_verb'>verb</span><span class='comma'>,</span> <span class='id identifier rubyid_uri'>uri</span><span class='comma'>,</span> <span class='label'>matcher_class:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>view_class:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>settings:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>You didn&#39;t pass any settings</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_settings'>settings</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='ivar'>@settings</span> <span class='op'>=</span> <span class='id identifier rubyid_settings'>settings</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="../../Pluggy.html" title="Pluggy (module)">Pluggy</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Settings.html" title="Pluggy::Settings (class)">Settings</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="../Settings.html#initialize-instance_method" title="Pluggy::Settings#initialize (method)">new</a></span></span>
+  <span class='ivar'>@view_class</span> <span class='op'>=</span> <span class='id identifier rubyid_view_class'>view_class</span>
+  <span class='ivar'>@verb</span> <span class='op'>=</span> <span class='id identifier rubyid_format_verb'>format_verb</span><span class='lparen'>(</span><span class='id identifier rubyid_verb'>verb</span><span class='rparen'>)</span>
+  <span class='ivar'>@uri</span> <span class='op'>=</span> <span class='id identifier rubyid_format_uri'>format_uri</span><span class='lparen'>(</span><span class='id identifier rubyid_uri'>uri</span><span class='rparen'>)</span>
+  <span class='ivar'>@pattern</span> <span class='op'>=</span> <span class='id identifier rubyid_matcher_class'>matcher_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@uri</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_matcher_class'>matcher_class</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span> <span class='symbol'>:new</span>
+  <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>block:</span> <span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_action_class'>action_class</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_opts'>parse_opts</span><span class='lparen'>(</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_action_class'>action_class</span><span class='embexpr_end'>}</span><span class='tstring_content'> disabled</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_action_class'>action_class</span><span class='period'>.</span><span class='id identifier rubyid_enabled?'>enabled?</span><span class='lparen'>(</span><span class='ivar'>@settings</span><span class='rparen'>)</span>
+  <span class='ivar'>@action</span> <span class='op'>=</span> <span class='id identifier rubyid_action_class'>action_class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='label'>mime_type:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:mime_type</span><span class='rbracket'>]</span><span class='comma'>,</span>
+                                    <span class='label'>view_class:</span> <span class='ivar'>@view_class</span><span class='comma'>,</span>
+                                    <span class='label'>settings:</span> <span class='ivar'>@settings</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="action-instance_method">
+  
+    #<strong>action</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute action</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+92
+93
+94</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 92</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_action'>action</span>
+  <span class='ivar'>@action</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="pattern-instance_method">
+  
+    #<strong>pattern</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute pattern</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+92
+93
+94</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 92</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pattern'>pattern</span>
+  <span class='ivar'>@pattern</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="uri-instance_method">
+  
+    #<strong>uri</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute uri</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+92
+93
+94</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 92</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_uri'>uri</span>
+  <span class='ivar'>@uri</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="verb-instance_method">
+  
+    #<strong>verb</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute verb</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+92
+93
+94</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 92</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_verb'>verb</span>
+  <span class='ivar'>@verb</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="evaluate_with-instance_method">
+  
+    #<strong>evaluate_with</strong>(env, req = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This is part of the specification for <span class='object_link'><a href="" title="Pluggy::Router::Route (class)">Pluggy::Router::Route</a></span>s.</p>
+
+<p></p>
+</div>
+  </div>
+
+<p>Possibly, eventually, there should be a way to insert custom params
+injected by the router. But currently the only way is to manipulate
+the request object and inject params there -- and in that case, you
+can&#39;t override the path_params. But the path_params will be {} if
+@pattern.nil?, so injecting into the Rack::Request will work.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+133
+134
+135
+136
+137
+138</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 133</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_evaluate_with'>evaluate_with</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_req'>req</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_req'>req</span> <span class='op'>||=</span> <span class='const'>Rack</span><span class='op'>::</span><span class='const'>Request</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_request_params'>request_params</span> <span class='op'>=</span> <span class='id identifier rubyid_req'>req</span><span class='period'>.</span><span class='id identifier rubyid_params'>params</span><span class='period'>.</span><span class='id identifier rubyid_symbolize_keys'>symbolize_keys</span>
+  <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='id identifier rubyid_request_params'>request_params</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_path_params'>path_params</span><span class='lparen'>(</span><span class='id identifier rubyid_req'>req</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@action</span><span class='period'>.</span><span class='id identifier rubyid_evaluate'>evaluate</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_req'>req</span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="matches?-instance_method">
+  
+    #<strong>matches?</strong>(uri: nil, verb: nil, **opts)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This is part of the specification for <span class='object_link'><a href="" title="Pluggy::Router::Route (class)">Pluggy::Router::Route</a></span>s.</p>
+
+<p></p>
+</div>
+  </div>
+
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+160
+161
+162
+163</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 160</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_matches?'>matches?</span><span class='lparen'>(</span><span class='label'>uri:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>verb:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_uri'>uri</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_verb'>verb</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_matches_uri?'>matches_uri?</span><span class='lparen'>(</span><span class='id identifier rubyid_uri'>uri</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_matches_verb?'>matches_verb?</span><span class='lparen'>(</span><span class='id identifier rubyid_verb'>verb</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="matches_uri?-instance_method">
+  
+    #<strong>matches_uri?</strong>(uri, **_opts)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>A helper method for <span class='object_link'><a href="#matches%3F-instance_method" title="Pluggy::Router::Route#matches? (method)">#matches?</a></span>. It returns true when URI is nil to
+play nice with <span class='object_link'><a href="#matches%3F-instance_method" title="Pluggy::Router::Route#matches? (method)">#matches?</a></span>. If no matcher is provided, it will look
+for an exact match, otherwise it will try to use the matcher.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>uri</span>
+      
+      
+        <span class='type'>(<tt>#to_s</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The URI to check against the current route.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+145
+146
+147
+148
+149</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 145</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_matches_uri?'>matches_uri?</span><span class='lparen'>(</span><span class='id identifier rubyid_uri'>uri</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__opts'>_opts</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_uri'>uri</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='kw'>return</span> <span class='ivar'>@uri</span> <span class='op'>==</span> <span class='id identifier rubyid_format_uri'>format_uri</span><span class='lparen'>(</span><span class='id identifier rubyid_uri'>uri</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='ivar'>@pattern</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span> <span class='symbol'>:match</span>
+  <span class='ivar'>@pattern</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='id identifier rubyid_format_uri'>format_uri</span><span class='lparen'>(</span><span class='id identifier rubyid_uri'>uri</span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="matches_verb?-instance_method">
+  
+    #<strong>matches_verb?</strong>(verb = nil, **_opts)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>A helper method for <span class='object_link'><a href="#matches%3F-instance_method" title="Pluggy::Router::Route#matches? (method)">#matches?</a></span>. It returns true when verb is nil
+to play nice with <span class='object_link'><a href="#matches%3F-instance_method" title="Pluggy::Router::Route#matches? (method)">#matches?</a></span>. It simply checks for a (formatted)
+exact match.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+154
+155
+156
+157</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/pluggy/routing.rb', line 154</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_matches_verb?'>matches_verb?</span><span class='lparen'>(</span><span class='id identifier rubyid_verb'>verb</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__opts'>_opts</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_verb'>verb</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_format_verb'>format_verb</span><span class='lparen'>(</span><span class='id identifier rubyid_verb'>verb</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='ivar'>@verb</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Dec 29 20:43:54 2017 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.3.3).
+</div>
+
+    </div>
+  </body>
+</html>
