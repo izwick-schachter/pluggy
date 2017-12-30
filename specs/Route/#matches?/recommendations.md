@@ -1,0 +1,1 @@
+The hash will typically contiain `uri` and `verb`, which are the things to be checked against. It is also typical to provide public helper methods, `matches_uri?` and `matches_verb?` (each taking one argument) to allow easier testing.

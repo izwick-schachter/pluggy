@@ -1,0 +1,1 @@
+It must take two arguments (env (a hash) and req (a Rack::Request)) and return a View based on the env and other stored information in the Route.

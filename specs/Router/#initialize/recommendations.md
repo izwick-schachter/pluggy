@@ -1,0 +1,1 @@
+Take an Array of Route objects to create the Router with as the first argument.

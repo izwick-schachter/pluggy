@@ -1,0 +1,1 @@
+Typically this method is simply a wrapper for the ActionClass and also is responsible for pulling the params out of the env/req and path.

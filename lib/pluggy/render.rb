@@ -1,7 +1,9 @@
 module Pluggy
   class View
-    attr_reader :content, :mime_type, :filename
+    attr_reader :content, :mime_type
 
+    # @spec
+    # @todo Document/Refactor
     def initialize(content = nil, mime_type: nil, settings: nil, filename: '')
       warn 'No settings passed' if settings.nil?
       content = content.content while content.is_a?(View)
@@ -15,6 +17,7 @@ module Pluggy
       @mime_type = mime_type || (@filename.empty? ? default : ext_mime_type)
     end
 
+    # @spec
     def compile(b = TOPLEVEL_BINDING)
       @content = @settings[:compilers].compile(@file, b) unless @file.nil?
       self

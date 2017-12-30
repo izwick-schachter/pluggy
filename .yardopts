@@ -1,0 +1,5 @@
+-M redcarpet
+-m markdown
+--output-dir docs
+-
+specs/*.md

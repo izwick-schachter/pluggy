@@ -5,17 +5,24 @@ require 'pluggy/routing/block'
 require 'pluggy/routing/controller'
 
 module Pluggy
-  # Here's an interesting thing about Matchers -- by default they use the
-  # Router's matcher_class, but sometimes they can have a custom matcher.
-  # Checking if a Route is matched is up to the Route, **not** the router. A
-  # router _could_ steal that power by checking the Route itself and checking
-  # matches there, but then it'd have to manipulate req and env to insert the
-  # path params in.
+  # {include:file:specs/Router.md}
+  #
+  # @note Here's an interesting thing about Matchers -- by default they use
+  #   the Router's matcher_class, but sometimes they can have a custom matcher.
+  #   Checking if a Route is matched is up to the Route, **not** the router. A
+  #   router _could_ steal that power by checking the Route itself and checking
+  #   matches there, but then it'd have to manipulate req and env to insert the
+  #   path params in.
   class Router
+    # An array of routes that the {Router} will route to.
     attr_reader :routes
-
     attr_accessor :settings
 
+    # Creates a new router, either with no routes or with an array of routes
+    # that are passed to it.
+    #
+    # @spec
+    # @param [Array<Route>] routes The routes to create the {Router} from.
     def initialize(routes = [], route_class: Route, matcher_class: nil, view_class: nil, settings: nil)
       warn 'You did not pass a matcher' if matcher_class.nil?
       warn 'You did not pass any settings' if settings.nil?
@@ -26,6 +33,13 @@ module Pluggy
       @matcher_class = matcher_class
     end
 
+    # Creates a route that the router will track. These routes will then be
+    # searched in {where} and {find_by}.
+    #
+    # @see The documentation for {Route#initialize}, because arguments to
+    #   this method are passed directly to {Route#initialize}.
+    #
+    # @spec
     def route(*args, **opts, &block)
       opts = { view_class: @view_class,
                matcher_class: @matcher_class,
@@ -33,6 +47,14 @@ module Pluggy
       @routes.push @route_class.new(*args, **opts, &block)
     end
 
+    # The router seaches through its routes based on the options passed to this
+    # method.
+    #
+    # @spec
+    # @param [#to_s] uri The uri that you're trying to match.
+    # @param [#to_sym] verb The verb you're trying to match.
+    # @param opts The options (e.g. mustermann: true)
+    # @return [Array<Route>]
     def where(uri: nil, verb: nil, **opts)
       verb = verb.downcase.to_sym unless verb.nil?
       uri = uri.to_s unless uri.nil?
@@ -41,6 +63,14 @@ module Pluggy
       end
     end
 
+    # Similar to {#where}, but only returns one route. This is the method where
+    # the {Router} deals with precedence of different routes.
+    #
+    # @spec
+    # @param [#to_s] uri The uri that you're trying to match.
+    # @param [#to_sym] verb The verb you're trying to match.
+    # @param opts The options (e.g. mustermann: true)
+    # @return [Route]
     def find_by(uri: nil, verb: nil, **opts)
       where(uri: uri, verb: verb, **opts).first
     end
@@ -55,17 +85,29 @@ module Pluggy
       verb.downcase.to_sym
     end
 
+    # {include:file:specs/Route.md}
     class Route
       using ConvenienceRefinements
 
       attr_reader :verb, :uri, :action, :pattern
 
+      # An array which maps route types to their corresponding classes.
+      # @todo Possibly this should be delegated to {Router}
       OPT_TO_TYPE = {
         block: Route::Block,
         asset: Route::Asset,
         to: Route::Controller
       }.freeze
 
+      # @spec
+      #
+      # @param [#to_sym] verb The HTTP verb the route should respond to.
+      # @param [#to_s] uri The URI the route should respond to.
+      # @param matcher_class A matcher class which follows the matcher class
+      #   spec. By default, Mustermann.
+      # @param view_class A view class which follows the view class spec. By
+      #   default, the {Pluggy::View} class.
+      # @param [Pluggy::Settings] settings The settings to run the route under.
       def initialize(verb, uri, matcher_class: nil, view_class: nil, settings: nil, **opts, &block)
         warn "You didn't pass any settings" if settings.nil?
         @settings = settings || Pluggy::Settings.new
@@ -81,6 +123,8 @@ module Pluggy
                                           settings: @settings)
       end
 
+      # @spec
+      #
       # Possibly, eventually, there should be a way to insert custom params
       # injected by the router. But currently the only way is to manipulate
       # the request object and inject params there -- and in that case, you
@@ -93,17 +137,26 @@ module Pluggy
         @action.evaluate(env, req, params)
       end
 
+      # A helper method for {#matches?}. It returns true when URI is nil to
+      # play nice with {#matches?}. If no matcher is provided, it will look
+      # for an exact match, otherwise it will try to use the matcher.
+      #
+      # @param [#to_s] uri The URI to check against the current route.
       def matches_uri?(uri, **_opts)
         return true if uri.nil?
         return @uri == format_uri(uri) unless @pattern.respond_to? :match
         @pattern.match(format_uri(uri))
       end
 
+      # A helper method for {#matches?}. It returns true when verb is nil
+      # to play nice with {#matches?}. It simply checks for a (formatted)
+      # exact match.
       def matches_verb?(verb = nil, **_opts)
         return true if verb.nil?
         format_verb(verb) == @verb
       end
 
+      # @spec
       def matches?(uri: nil, verb: nil, **opts)
         return false if uri.nil? && verb.nil?
         matches_uri?(uri, **opts) && matches_verb?(verb, **opts)

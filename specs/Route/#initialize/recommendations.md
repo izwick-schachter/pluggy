@@ -1,0 +1,1 @@
+It should standardize the `verb` and `uri` in some way, and additionally it should take `matcher_class:`, `view_class:`, and `settings:` keyword arguments in order to be compatible with the respective sub-specs. Typically, on initialization, a Route will generate an instance of an ActionClass which becomes responsible for actually evaluating the route.
