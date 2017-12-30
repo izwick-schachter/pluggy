@@ -1,0 +1,1 @@
+It must take a hash, and using that hash must return a truthy or falsy value depending of weather that route matched the hash passed.

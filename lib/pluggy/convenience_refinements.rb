@@ -1,5 +1,5 @@
 module Pluggy
-  # A buch of refinements that just make life a bit easier. For further docs,
+  # A bunch of refinements that just make life a bit easier. For further docs,
   # view the source.
   module ConvenienceRefinements
     refine String do

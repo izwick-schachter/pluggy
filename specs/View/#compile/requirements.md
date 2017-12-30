@@ -1,0 +1,1 @@
+It must respond to the `#compile` method (which optionally takes a binding) and return a (possibly different) View object which has been compiled.

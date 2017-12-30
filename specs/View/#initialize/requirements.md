@@ -1,0 +1,1 @@
+It must have an initializer which takes arguments of the form `#initialize(content = nil, mime_type: nil, settings: nil, filename: '')`.
