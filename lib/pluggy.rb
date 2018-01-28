@@ -25,10 +25,6 @@ def get(*args, **opts, &block)
   route(:get, *args, **opts, &block)
 end
 
-def start
-  APP.start
-end
-
 def to_compile(ext, &block)
   APP.to_compile(ext.to_sym, &block)
 end
@@ -37,4 +33,6 @@ to_compile :erb do |t, b|
   ERB.new(t).result(b)
 end
 
-at_exit { start }
+def alias_file(target, source)
+  get(target, asset: source)
+end
