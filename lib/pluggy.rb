@@ -1,6 +1,7 @@
 require 'pluggy/version'
 require 'pluggy/convenience_refinements'
 
+require 'pluggy/hooks'
 require 'pluggy/settings'
 
 require 'pluggy/render'

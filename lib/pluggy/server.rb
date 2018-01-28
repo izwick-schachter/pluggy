@@ -10,6 +10,8 @@ module Pluggy
 
     # rubocop:disable Metrics/AbcSize
     def call(env)
+      resp = Hook.call_hooks :request_start, env
+      return resp if valid_resp? resp
       req = Rack::Request.new(env)
       puts "Getting for #{req.path}##{req.request_method.downcase.to_sym}"
       route = @router.find_by(
@@ -17,12 +19,12 @@ module Pluggy
         verb: req.request_method,
         mustermann: true
       )
-      return status 404 if route.nil?
+      return Hook.call_hooks(:not_found, env) || status(404) if route.nil?
       result = route.evaluate_with(env, req)
       view = result.is_a?(View) ? result : View.new(result)
-      rval = [view.content ? 200 : 404, headers(view), [view.content.to_s]]
-      puts "Returning #{rval}"
-      rval
+      resp = [view.content ? 200 : 404, headers(view), [view.content.to_s]]
+      mod = Hook.call_hooks(:final_response, resp)
+      valid_resp?(mod) ? mod : resp
     end
     # rubocop:enable Metrics/AbcSize
 
@@ -34,6 +36,13 @@ module Pluggy
 
     def status(status_code)
       [status_code, {}, ["Status #{status_code}"]]
+    end
+
+    def valid_resp?(resp)
+      resp.is_a?(Array) &&
+      resp[0].to_s.is_a?(String) &&
+      resp[1].is_a?(Hash) &&
+      resp[2].respond_to?(:each)
     end
   end
 end
