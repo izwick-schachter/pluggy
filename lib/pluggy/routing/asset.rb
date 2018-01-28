@@ -4,12 +4,11 @@ module Pluggy
       class Asset < Action
         def initialize(filename, block: nil, **opts)
           super(**opts)
-          @filename = filename
+          @file = File.new(Dir["#{File.join(asset_dir, filename)}*"][0])
           @block = block
         end
 
         def evaluate(env, req, params)
-          file = File.new(File.join(asset_dir, @filename))
           scope = Class.new
           scope.send(:define_method, :params) { params }
           scope.send(:define_method, :req) { req }
@@ -17,7 +16,7 @@ module Pluggy
           inst = scope.new
           inst.instance_exec(&@block) unless @block.nil?
           b = inst.instance_exec { binding }
-          @view_class.new(file.read, filename: file.to_path, settings: @settings).compile(b)
+          @view_class.new(@file.read, filename: @file.to_path, settings: @settings).compile(b)
         end
 
         def self.enabled?(settings)
