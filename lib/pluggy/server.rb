@@ -19,9 +19,18 @@ module Pluggy
         verb: req.request_method,
         mustermann: true
       )
-      return Hook.call_hooks(:not_found, env) || status(404) if route.nil?
-      result = route.evaluate_with(env, req)
-      view = result.is_a?(View) ? result : View.new(result)
+      if route.nil?
+        fpath = File.join(@settings[:asset_path], req.path)
+        if req.request_method.downcase.to_sym == :get && File.exist?(fpath) && !Dir.exist?(fpath)
+          view = View.new(File.read(fpath), settings: @settings, filename: fpath)
+        else
+          nf_hook = Hook.call_hooks(:not_found, uri: req.path, verb: req.request_method, settings: @settings, env: env)
+          return valid_resp?(nf_hook) ? nf_hook : status(404)
+        end
+      else
+        result = route.evaluate_with(env, req)
+        view = result.is_a?(View) ? result : View.new(result)
+      end
       resp = [view.content ? 200 : 404, headers(view), [view.content.to_s]]
       mod = Hook.call_hooks(:final_response, resp)
       valid_resp?(mod) ? mod : resp
