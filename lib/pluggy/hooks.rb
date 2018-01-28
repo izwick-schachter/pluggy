@@ -9,7 +9,7 @@ module Pluggy
 
       def call_hooks(hook, *args)
         setup
-        @hooks[hook].each { |h| h.call(*args) }
+        @hooks[hook].map { |h| h.call(*args) }
       end
 
       def setup

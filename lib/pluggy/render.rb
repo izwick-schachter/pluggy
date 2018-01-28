@@ -11,7 +11,7 @@ module Pluggy
       @settings = settings
       @file = File.new(filename) if File.exist? filename
       @filename = File.basename filename
-      ext = @filename.split('.').last
+      ext = @filename.split('.')[1]
       ext_mime_type = Rack::Mime.mime_type(".#{ext}")
       default = @settings[:default_mime_type]
       @mime_type = mime_type || (@filename.empty? ? default : ext_mime_type)
