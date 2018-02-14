@@ -11,6 +11,8 @@ require 'pluggy/server'
 require 'pluggy/compiler'
 require 'pluggy/controller'
 
+require 'pluggy/websocket'
+
 require 'pluggy/initializers'
 
 require 'pluggy/app'
@@ -27,6 +29,10 @@ end
 
 def to_compile(ext, &block)
   APP.to_compile(ext.to_sym, &block)
+end
+
+def ws(*args)
+  APP.ws(*args)
 end
 
 to_compile :erb do |t, b|

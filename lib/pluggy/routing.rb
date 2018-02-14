@@ -1,9 +1,3 @@
-require 'pluggy/routing/action'
-
-require 'pluggy/routing/asset'
-require 'pluggy/routing/block'
-require 'pluggy/routing/controller'
-
 module Pluggy
   # {include:file:specs/Router.md}
   #
@@ -85,56 +79,13 @@ module Pluggy
       verb.downcase.to_sym
     end
 
-    # {include:file:specs/Route.md}
-    class Route
-      using ConvenienceRefinements
-
-      attr_reader :verb, :uri, :action, :pattern
-
-      # An array which maps route types to their corresponding classes.
-      # @todo Possibly this should be delegated to {Router}
-      OPT_TO_TYPE = [
-        [:asset, Route::Asset],
-        [:block, Route::Block],
-        [:to, Route::Controller]
-      ].freeze
-
-      # @spec
-      #
-      # @param [#to_sym] verb The HTTP verb the route should respond to.
-      # @param [#to_s] uri The URI the route should respond to.
-      # @param matcher_class A matcher class which follows the matcher class
-      #   spec. By default, Mustermann.
-      # @param view_class A view class which follows the view class spec. By
-      #   default, the {Pluggy::View} class.
-      # @param [Pluggy::Settings] settings The settings to run the route under.
-      def initialize(verb, uri, matcher_class: nil, view_class: nil, settings: nil, **opts, &block)
+    class Routable
+      def initialize(verb, uri, matcher_class: nil, settings: nil, **opts, &block)
         warn "You didn't pass any settings" if settings.nil?
         @settings = settings || Pluggy::Settings.new
-        @view_class = view_class
         @verb = format_verb(verb)
         @uri = format_uri(uri)
         @pattern = matcher_class.new(@uri) if matcher_class.respond_to? :new
-        opts = opts.merge(block: block)
-        action_class, value = parse_opts(opts)
-        warn "#{action_class} disabled" unless action_class.enabled?(@settings)
-        @action = action_class.new(value, mime_type: opts[:mime_type],
-                                          view_class: @view_class,
-                                          settings: @settings, **opts)
-      end
-
-      # @spec
-      #
-      # Possibly, eventually, there should be a way to insert custom params
-      # injected by the router. But currently the only way is to manipulate
-      # the request object and inject params there -- and in that case, you
-      # can't override the path_params. But the path_params will be {} if
-      # @pattern.nil?, so injecting into the Rack::Request will work.
-      def evaluate_with(env, req = nil)
-        req ||= Rack::Request.new(env)
-        request_params = req.params.symbolize_keys
-        params = request_params.merge(path_params(req.path))
-        @action.evaluate(env, req, params)
       end
 
       # A helper method for {#matches?}. It returns true when URI is nil to
@@ -164,6 +115,76 @@ module Pluggy
 
       private
 
+      def format_uri(uri)
+        uri.to_s
+      end
+
+      def format_verb(verb)
+        verb.downcase.to_sym
+      end
+    end
+
+
+    # {include:file:specs/Route.md}
+    class Route < Routable
+      using ConvenienceRefinements
+
+      # This is ugly, but if these move to the top of the file, you'll get
+      # a superclass mismatch because Route gets created extending Object,
+      # and you're trying to make it extend Routable here.
+      
+      require 'pluggy/routing/action'
+
+      require 'pluggy/routing/asset'
+      require 'pluggy/routing/block'
+      require 'pluggy/routing/controller'
+
+      attr_reader :verb, :uri, :action, :pattern
+
+      # An array which maps route types to their corresponding classes.
+      # @todo Possibly this should be delegated to {Router}
+      OPT_TO_TYPE = [
+        [:asset, Route::Asset],
+        [:block, Route::Block],
+        [:to, Route::Controller]
+      ].freeze
+
+      # @spec
+      #
+      # @param [#to_sym] verb The HTTP verb the route should respond to.
+      # @param [#to_s] uri The URI the route should respond to.
+      # @param matcher_class A matcher class which follows the matcher class
+      #   spec. By default, Mustermann.
+      # @param view_class A view class which follows the view class spec. By
+      #   default, the {Pluggy::View} class.
+      # @param [Pluggy::Settings] settings The settings to run the route under.
+      def initialize(*args, view_class: nil, **opts, &block)
+        super(*args, **opts)
+        @view_class = view_class
+        opts = opts.merge(block: block)
+        action_class, value = parse_opts(opts)
+        warn "#{action_class} disabled" unless action_class.enabled?(@settings)
+        @action = action_class.new(value, mime_type: opts[:mime_type],
+                                          view_class: @view_class,
+                                          settings: @settings, **opts)
+      end
+
+      # @spec
+      #
+      # Possibly, eventually, there should be a way to insert custom params
+      # injected by the router. But currently the only way is to manipulate
+      # the request object and inject params there -- and in that case, you
+      # can't override the path_params. But the path_params will be {} if
+      # @pattern.nil?, so injecting into the Rack::Request will work.
+      def evaluate_with(env, req = nil)
+        req ||= Rack::Request.new(env)
+        request_params = req.params.symbolize_keys
+        params = request_params.merge(path_params(req.path))
+        @action.evaluate(env, req, params)
+      end
+
+      private
+
       def parse_opts(opts)
         opt = OPT_TO_TYPE.select { |k, v| opts.keys.include?(k) && !opts[k].nil? }
         error = 'No action, asset or block passed'
@@ -172,14 +193,6 @@ module Pluggy
         key, action_class = opt[0]
         # [action_class, value]
         [action_class, opts[key]]
-      end
-
-      def format_uri(uri)
-        uri.to_s
-      end
-
-      def format_verb(verb)
-        verb.downcase.to_sym
       end
 
       def path_params(path)

@@ -41,6 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop',   '~> 0.52'
   spec.add_development_dependency 'yard',      '~> 0.9'
 
-  spec.add_runtime_dependency 'mustermann', '~> 1.0'
-  spec.add_runtime_dependency 'rack',       '~> 2.0'
+  spec.add_runtime_dependency 'mustermann',     '~> 1.0'
+  spec.add_runtime_dependency 'rack',           '~> 2.0'
+  spec.add_runtime_dependency 'faye-websocket', '~> 0.10'
 end
