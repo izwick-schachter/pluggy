@@ -40,8 +40,8 @@ module Pluggy
     #   can handle it.
     # @param [Binding] b Pass a binding which is also forewarded
     #   to the @block.
-    def run(text, b = @block.binding)
-      @block.call(text, b)
+    def run(text, target_binding = @block.binding)
+      @block.call(text, target_binding)
     end
 
     class Collection
@@ -63,15 +63,15 @@ module Pluggy
       end
 
       # Used for the aliasing of {Compiler#run} to Compiler.\<name\>
-      def method_missing(m, *args, &block)
-        return compiler(m).run(*args, &block) if compiler_names.include?(m)
+      def method_missing(method_name, *args, &block)
+        return compiler(method_name).run(*args, &block) if compiler_names.include?(method_name)
         super
       end
 
       # Used for the aliasing of {Compiler#run} to Compiler.\<name\>
       # @see #method_missing
-      def respond_to_missing?(m, *args, &block)
-        compiler_names.include?(m) || super
+      def respond_to_missing?(method_name, *args, &block)
+        compiler_names.include?(method_name) || super
       end
 
       # Compiles file with binding b. It also assumes which compilers to use
@@ -81,12 +81,12 @@ module Pluggy
       #   path is not valid
       # @param [Binding] b The binding in which to compile. This is passed
       #   directly to {Compiler#run}
-      def compile(file, b = TOPLEVEL_BINDING)
+      def compile(file, target_binding = TOPLEVEL_BINDING)
         file = File.new(file)
         extensions = File.basename(file).split('.')[1..-1]
         valid_exts = extensions.map(&:to_sym) & compiler_names.map(&:to_sym)
         valid_exts.inject(file.read) do |content, ext|
-          compiler(ext).run(content, b)
+          compiler(ext).run(content, target_binding)
         end
       end
 

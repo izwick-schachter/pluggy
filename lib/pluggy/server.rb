@@ -8,7 +8,7 @@ module Pluggy
       @router = router
     end
 
-    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     def call(env)
       resp = Hook.call_hooks(:request_start, env)[0]
       return resp if valid_resp? resp
@@ -35,12 +35,12 @@ module Pluggy
       mod = Hook.call_hooks(:final_response, resp)[0]
       valid_resp?(mod) ? mod : resp
     end
-    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
 
     private
 
-    def headers(r)
-      { 'Content-Type' => r.mime_type }
+    def headers(request)
+      { 'Content-Type' => request.mime_type }
     end
 
     def status(status_code)
@@ -49,9 +49,9 @@ module Pluggy
 
     def valid_resp?(resp)
       resp.is_a?(Array) &&
-      resp[0].to_s.is_a?(String) &&
-      resp[1].is_a?(Hash) &&
-      resp[2].respond_to?(:each)
+        resp[0].to_s.is_a?(String) &&
+        resp[1].is_a?(Hash) &&
+        resp[2].respond_to?(:each)
     end
   end
 end

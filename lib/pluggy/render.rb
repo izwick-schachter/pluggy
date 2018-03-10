@@ -18,8 +18,8 @@ module Pluggy
     end
 
     # @spec
-    def compile(b = TOPLEVEL_BINDING)
-      @content = @settings[:compilers].compile(@file, b) unless @file.nil?
+    def compile(target_binding = TOPLEVEL_BINDING)
+      @content = @settings[:compilers].compile(@file, target_binding) unless @file.nil?
       self
     end
   end

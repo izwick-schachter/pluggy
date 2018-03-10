@@ -8,9 +8,7 @@ YARD::Parser::SourceParser.after_parse_list do
     file = "{include:file:specs/Router/##{meth.name}/requirements.md}"
     content = 'This is part of the specification for ' \
               "{#{class_name}}s.\n\n  #{file}"
-    unless spec_tag.text.empty?
-      content = "#{spec_tag.text}\n\n  **Note:** #{content}"
-    end
+    content = "#{spec_tag.text}\n\n  **Note:** #{content}" unless spec_tag.text.empty?
     meth.add_tag YARD::Tags::Tag.new(:note, content)
   end
 end

@@ -22,12 +22,12 @@ module Pluggy
         @value = @initial_value
       end
 
-      def method_missing(m, *args, &block)
-        @value.respond_to?(m) ? @value.method(m).call(*args, &block) : super
+      def method_missing(method_name, *args, &block)
+        @value.respond_to?(method_name) ? @value.method(m).call(*args, &block) : super
       end
 
-      def respond_to_missing?(m, *args, &block)
-        @value.respond_to?(m) || super
+      def respond_to_missing?(method_name, *args, &block)
+        @value.respond_to?(method_name) || super
       end
     end
   end

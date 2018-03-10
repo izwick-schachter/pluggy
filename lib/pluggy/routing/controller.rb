@@ -4,10 +4,10 @@ module Pluggy
       class Controller < Action
         using ConvenienceRefinements
 
-        def initialize(to, mime_type: 'text/html', **opts)
+        def initialize(target, mime_type: 'text/html', **opts)
           super(**opts)
           @mime_type = mime_type
-          controller, @action_name = to.split('#')
+          controller, @action_name = target.split('#')
           @controller_name = controller_name_from(controller)
           load_controller @controller_name
           controller_action_from(@controller_name, @action_name)

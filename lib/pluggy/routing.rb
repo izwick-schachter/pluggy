@@ -80,7 +80,7 @@ module Pluggy
     end
 
     class Routable
-      def initialize(verb, uri, matcher_class: nil, settings: nil, **opts, &block)
+      def initialize(verb, uri, matcher_class: nil, settings: nil, **_opts)
         warn "You didn't pass any settings" if settings.nil?
         @settings = settings || Pluggy::Settings.new
         @verb = format_verb(verb)
@@ -124,7 +124,6 @@ module Pluggy
       end
     end
 
-
     # {include:file:specs/Route.md}
     class Route < Routable
       using ConvenienceRefinements
@@ -132,7 +131,7 @@ module Pluggy
       # This is ugly, but if these move to the top of the file, you'll get
       # a superclass mismatch because Route gets created extending Object,
       # and you're trying to make it extend Routable here.
-      
+
       require 'pluggy/routing/action'
 
       require 'pluggy/routing/asset'
@@ -186,7 +185,7 @@ module Pluggy
       private
 
       def parse_opts(opts)
-        opt = OPT_TO_TYPE.select { |k, v| opts.keys.include?(k) && !opts[k].nil? }
+        opt = OPT_TO_TYPE.select { |k, _v| opts.keys.include?(k) && !opts[k].nil? }
         error = 'No action, asset or block passed'
         throw error unless opt.length >= 1
         warn 'More than one action class matched' if opt.length > 1

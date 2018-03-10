@@ -6,28 +6,17 @@ module Pluggy
   class App
     attr_accessor :server, :router, :settings, :wsstack_collection
 
-    def initialize(server: Pluggy::Server, router: Pluggy::Router, route: Pluggy::Router::Route, view: Pluggy::View, matcher: Mustermann, settings: [])
+    # rubocop:disable Metrics/ParameterLists
+    def initialize(server: Pluggy::Server, router: Pluggy::Router,
+                   route: Pluggy::Router::Route, view: Pluggy::View,
+                   matcher: Mustermann, settings: [])
+      # rubocop:enable Metrics/ParameterLists
       @settings = Pluggy::Settings.new(settings)
       @compilers = @settings[:compilers]
       @router = router.new(route_class: route, matcher_class: matcher, view_class: view, settings: @settings)
       @server = server
 
-      @wsstack_collection = WSStackCollection.new
-      Hook.register to: :request_start do |env|
-        if Faye::WebSocket.websocket?(env)
-          req = Rack::Request.new(env)
-          ws = Faye::WebSocket.new(env)
-          @wsstack_collection.select { |wsstack| wsstack.matches?(uri: req.path) }.each do |wsstack|
-            wsstack.defaults.each do |event, block|
-              ws.on event do |e|
-                block.call(e, ws)
-              end
-            end
-            wsstack.push(ws)
-          end
-          ws.rack_response
-        end
-      end
+      configure_websockets
     end
 
     def to_compile(ext, &block)
@@ -48,6 +37,24 @@ module Pluggy
 
     def ws(*args)
       @wsstack_collection.ws(*args)
+    end
+
+    private
+
+    def configure_websockets
+      @wsstack_collection = WSStackCollection.new
+      Hook.register to: :request_start do |env|
+        next unless Faye::WebSocket.websocket?(env)
+        req = Rack::Request.new(env)
+        ws = Faye::WebSocket.new(env)
+        @wsstack_collection.select { |wsstack| wsstack.matches?(uri: req.path) }.each do |wsstack|
+          wsstack.defaults.each do |event, block|
+            ws.on(event) { |e| block.call(e, ws) }
+          end
+          wsstack.push(ws)
+        end
+        ws.rack_response
+      end
     end
   end
 end

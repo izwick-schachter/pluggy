@@ -20,6 +20,12 @@ Style/HashSyntax:
 Metrics/MethodLength:
   Max: 13
 
+Metrics/LineLength:
+  Max: 125
+
+Metrics/AbcSize:
+  Max: 16
+
 Style/UnneededPercentQ:
   Enabled: false
 

@@ -11,7 +11,7 @@ module Pluggy
     def ws(*args)
       wsstack = WSStack.new(*args)
       @wsstacks << wsstack
-      return wsstack
+      wsstack
     end
 
     def each(&block)
@@ -28,8 +28,8 @@ module Pluggy
       @defaults = []
     end
 
-    def push(ws)
-      @sockets << ws
+    def push(websocket)
+      @sockets << websocket
     end
 
     def default_for(event, &block)
