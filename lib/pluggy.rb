@@ -1,44 +1,43 @@
 require 'pluggy/version'
-require 'pluggy/convenience_refinements'
-
-require 'pluggy/hooks'
-require 'pluggy/settings'
-
-require 'pluggy/render'
-
-require 'pluggy/routing'
-require 'pluggy/server'
-require 'pluggy/compiler'
-require 'pluggy/controller'
-
-require 'pluggy/websocket'
-
-require 'pluggy/initializers'
-
 require 'pluggy/app'
 
+# This file just defines some shortcuts. To live without them
+# you can require 'pluggy/app'
+
+# APP as the master app
+
 APP = Pluggy::App.new
+
+# Define HTTP verb methods
 
 def route(*args, **opts, &block)
   APP.route(*args, **opts, &block)
 end
 
-def get(*args, **opts, &block)
-  route(:get, *args, **opts, &block)
+%i[get post put patch delete].each do |verb|
+  define_method(verb) do |*args, **opts, &block|
+    route(verb, *args, **opts, &block)
+  end
 end
 
-def to_compile(ext, &block)
-  APP.to_compile(ext.to_sym, &block)
-end
+# Websockets
 
 def ws(*args)
   APP.ws(*args)
 end
 
-to_compile :erb do |t, b|
-  ERB.new(t).result(b)
-end
+# Make files easier
 
 def alias_file(target, source)
   get(target, asset: source)
+end
+
+# Define easy use compiler methods
+
+def to_compile(ext, &block)
+  APP.to_compile(ext.to_sym, &block)
+end
+
+to_compile :erb do |t, b|
+  ERB.new(t).result(b)
 end

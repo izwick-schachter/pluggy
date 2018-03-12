@@ -8,11 +8,12 @@ module Pluggy
       # @see The Action Class spec
       class Action
         # Validates and creates @settings and @view_class for the ActionClass
-        def initialize(settings: nil, view_class: nil, **_opts)
+        def initialize(arg, settings: nil, view_class: nil, **_opts)
           warn 'No settings given' if settings.nil?
           throw 'No view class given' if view_class.nil?
           @settings = settings || Pluggy::Settings.new
           @view_class = view_class
+          throw "Invalid #{self}" unless self.class.valid?(arg, settings: @settings)
         end
 
         private

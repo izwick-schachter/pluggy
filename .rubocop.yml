@@ -17,6 +17,14 @@ Style/HashSyntax:
   Exclude:
     - Rakefile
 
+Lint/UnusedMethodArgument:
+  Exclude:
+    - lib/pluggy/actions/*
+
+Style/EmptyMethod:
+  Exclude:
+    - test/**/*
+
 Metrics/MethodLength:
   Max: 13
 
@@ -25,12 +33,6 @@ Metrics/LineLength:
 
 Metrics/AbcSize:
   Max: 16
-
-Style/UnneededPercentQ:
-  Enabled: false
-
-Style/PercentLiteralDelimiters:
-  Enabled: false
 
 Style/Documentation:
   Enabled: false

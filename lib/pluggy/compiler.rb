@@ -62,6 +62,13 @@ module Pluggy
         compiler(name)
       end
 
+      def <<(compiler)
+        throw 'Compilers must be of class Pluggy::Compiler' unless compiler.is_a?(Pluggy::Compiler)
+        @compilers << compiler
+      end
+
+      alias push <<
+
       # Used for the aliasing of {Compiler#run} to Compiler.\<name\>
       def method_missing(method_name, *args, &block)
         return compiler(method_name).run(*args, &block) if compiler_names.include?(method_name)
@@ -83,11 +90,14 @@ module Pluggy
       #   directly to {Compiler#run}
       def compile(file, target_binding = TOPLEVEL_BINDING)
         file = File.new(file)
+        sval = File.read(file)
         extensions = File.basename(file).split('.')[1..-1]
         valid_exts = extensions.map(&:to_sym) & compiler_names.map(&:to_sym)
-        valid_exts.inject(file.read) do |content, ext|
+        rval = valid_exts.inject(file.read) do |content, ext|
           compiler(ext).run(content, target_binding)
         end
+        puts "BLOORP #{rval}" if rval == sval
+        rval
       end
 
       private

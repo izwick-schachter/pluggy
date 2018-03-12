@@ -1,3 +1,5 @@
+require 'pluggy/actions/action'
+
 module Pluggy
   class Router
     class Route
@@ -5,7 +7,7 @@ module Pluggy
         using ConvenienceRefinements
 
         def initialize(target, mime_type: 'text/html', **opts)
-          super(**opts)
+          super(target, **opts)
           @mime_type = mime_type
           controller, @action_name = target.split('#')
           @controller_name = controller_name_from(controller)
@@ -26,6 +28,10 @@ module Pluggy
         def self.enabled?(settings)
           Dir.exist?(File.join(settings[:root], settings[:view_path])) &&
             Dir.exist?(File.join(settings[:root], settings[:controller_path]))
+        end
+
+        def self.valid?(target, settings: nil)
+          target.is_a?(String) || target.responds_to(:to_s)
         end
 
         private

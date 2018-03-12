@@ -1,22 +1,19 @@
 module Pluggy
-  module Hook
-    class << self
-      # rubocop:disable Naming/UncommunicativeMethodParamName
-      def register(to:, &block)
-        # rubocop:enable Naming/UncommunicativeMethodParamName
-        warn "No slot #{to} to hook into" unless hooks.include? to
-        hooks[to] << block
-      end
+  class Hooks
+    def initialize
+      @hooks = Hash.new { |hsh, key| hsh[key] = [] }
+    end
 
-      def call_hooks(hook, *args)
-        hooks[hook].map { |h| h.call(*args) }
-      end
+    # rubocop:disable Naming/UncommunicativeMethodParamName
+    def register(to:, &block)
+      # rubocop:enable Naming/UncommunicativeMethodParamName
+      warn "No slot #{to} to hook into" unless @hooks.include? to
+      @hooks[to] << block
+    end
 
-      private
-
-      def hooks
-        @hooks ||= Hash.new { |hsh, key| hsh[key] = [] }
-      end
+    def call_hooks(hook, *args)
+      result = @hooks[hook].map { |h| h.call(*args) }
+      result
     end
   end
 end

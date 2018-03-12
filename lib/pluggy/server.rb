@@ -10,7 +10,7 @@ module Pluggy
 
     # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     def call(env)
-      resp = Hook.call_hooks(:request_start, env)[0]
+      resp = @settings[:hooks].call_hooks(:request_start, env)[0]
       return resp if valid_resp? resp
       req = Rack::Request.new(env)
       puts "Getting for #{req.path}##{req.request_method.downcase.to_sym}"
@@ -24,7 +24,10 @@ module Pluggy
         if req.request_method.downcase.to_sym == :get && File.exist?(fpath) && !Dir.exist?(fpath)
           view = View.new(File.read(fpath), settings: @settings, filename: fpath)
         else
-          nf_hook = Hook.call_hooks(:not_found, uri: req.path, verb: req.request_method, settings: @settings, env: env)[0]
+          nf_hook = @settings[:hooks].call_hooks(:not_found, uri: req.path,
+                                                             verb: req.request_method,
+                                                             settings: @settings,
+                                                             env: env)[0]
           return valid_resp?(nf_hook) ? nf_hook : status(404)
         end
       else
@@ -32,7 +35,7 @@ module Pluggy
         view = result.is_a?(View) ? result : View.new(result)
       end
       resp = [view.content ? 200 : 404, headers(view), [view.content.to_s]]
-      mod = Hook.call_hooks(:final_response, resp)[0]
+      mod = @settings[:hooks].call_hooks(:final_response, resp)[0]
       valid_resp?(mod) ? mod : resp
     end
     # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity

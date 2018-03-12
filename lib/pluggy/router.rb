@@ -1,3 +1,5 @@
+require 'pluggy/view'
+
 module Pluggy
   # {include:file:specs/Router.md}
   #
@@ -17,7 +19,7 @@ module Pluggy
     #
     # @spec
     # @param [Array<Route>] routes The routes to create the {Router} from.
-    def initialize(routes = [], route_class: Route, matcher_class: nil, view_class: nil, settings: nil)
+    def initialize(routes = [], route_class: Route, matcher_class: nil, view_class: Pluggy::View, settings: nil)
       warn 'You did not pass a matcher' if matcher_class.nil?
       warn 'You did not pass any settings' if settings.nil?
       @settings = settings || Pluggy::Settings.new
@@ -38,7 +40,9 @@ module Pluggy
       opts = { view_class: @view_class,
                matcher_class: @matcher_class,
                settings: @settings }.merge(opts)
-      @routes.push @route_class.new(*args, **opts, &block)
+      route = @route_class.new(*args, **opts, &block)
+      @routes.push route
+      route
     end
 
     # The router seaches through its routes based on the options passed to this
@@ -132,11 +136,10 @@ module Pluggy
       # a superclass mismatch because Route gets created extending Object,
       # and you're trying to make it extend Routable here.
 
-      require 'pluggy/routing/action'
-
-      require 'pluggy/routing/asset'
-      require 'pluggy/routing/block'
-      require 'pluggy/routing/controller'
+      require 'pluggy/actions/asset'
+      require 'pluggy/actions/block'
+      require 'pluggy/actions/controller'
+      require 'pluggy/actions/text'
 
       attr_reader :verb, :uri, :action, :pattern
 
@@ -145,7 +148,8 @@ module Pluggy
       OPT_TO_TYPE = [
         [:asset, Route::Asset],
         [:block, Route::Block],
-        [:to, Route::Controller]
+        [:to, Route::Controller],
+        [:text, Route::Text]
       ].freeze
 
       # @spec
@@ -157,10 +161,13 @@ module Pluggy
       # @param view_class A view class which follows the view class spec. By
       #   default, the {Pluggy::View} class.
       # @param [Pluggy::Settings] settings The settings to run the route under.
-      def initialize(*args, view_class: nil, **opts, &block)
-        super(*args, **opts)
-        @view_class = view_class
-        opts = opts.merge(block: block)
+      def initialize(verb, uri, asset = nil, **opts, &block)
+        warn 'No settings passed' if opts[:settings].nil?
+        @settings = opts[:settings] || Settings.new
+        Route::Asset.valid?(asset, settings: @settings) ? opts[:asset] = asset : opts[:text] = asset
+        super(verb, uri, **opts)
+        @view_class = opts[:view_class]
+        opts[:block] = block
         action_class, value = parse_opts(opts)
         warn "#{action_class} disabled" unless action_class.enabled?(@settings)
         @action = action_class.new(value, mime_type: opts[:mime_type],
